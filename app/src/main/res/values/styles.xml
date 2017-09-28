@@ -1,0 +1,28 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorBleuClair</item>
+        <item name="colorPrimaryDark">@color/colorBleufFonce</item>
+        <item name="colorAccent">@color/colorGrisFonce</item>
+        <item name="windowNoTitle">true</item>
+        <item name="spinBars">true</item>
+        <item name="color">@android:color/white</item>
+        <item name="android:itemBackground">@android:color/white</item>
+        <item name="colorControlNormal">@color/colorGrisClair</item>
+        <item name="colorControlActivated">@color/colorGrisClair</item>
+        <item name="android:textColorHint">@color/colorGrisClair</item>
+
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+</resources>

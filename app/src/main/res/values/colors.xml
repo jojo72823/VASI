@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorGrisFonce">#7d7e81</color>
+    <color name="colorBleufFonce">#01364c</color>
+    <color name="colorBleuClair">#0a4963</color>
+    <color name="colorGrisClair">#a7a9ac</color>
+    <color name="colorWhite">#ffffff</color>
+
+
+    <!-- <color name="colorPrimary">#6d9eeb</color>
+    <color name="colorPrimaryDark">#2759a7</color>
+    <color name="colorAccent">#6d9eeb</color> -->
+</resources>

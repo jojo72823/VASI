@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.daumont.vasi.vasi.activity.Activity_details_cd">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/layout_infos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="QrCode de l'album"
+                android:textSize="20sp"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/imageView_qrcode"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/textView_nom_album"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="nom album"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView_nom_artist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="nom artiste"
+                android:textSize="20sp" />
+
+
+            <TextView
+                android:id="@+id/textView_proprietaire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Propriétaire"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView_etat_emprunt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Emprunté par JOJO72"
+                android:textSize="20sp" />
+
+
+        </LinearLayout>
+
+
+        <ListView
+            android:id="@+id/listView_titres"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="50dp"
+            android:visibility="visible" />
+
+
+    </LinearLayout>
+
+
+</android.support.v4.widget.NestedScrollView>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_info_utilisteur"
+        android:icon="@drawable/icon_user"
+        android:title="Informations utilisateur" />
+
+    <item
+        android:id="@+id/navigation_list_ses_cd"
+        android:icon="@drawable/icon_disc"
+        android:title="Ses CD" />
+
+    <item
+        android:id="@+id/navigation_list_cd_emprunter"
+        android:icon="@drawable/icon_disc"
+        android:title="CD empruntés "/>
+</menu>

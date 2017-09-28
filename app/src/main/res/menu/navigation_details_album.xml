@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_information_cd"
+        android:icon="@drawable/icon_disc"
+        android:title="Informations" />
+
+    <item
+        android:id="@+id/navigation_liste_titres"
+        android:icon="@drawable/icon_disc"
+        android:title="Les titres" />
+
+</menu>
