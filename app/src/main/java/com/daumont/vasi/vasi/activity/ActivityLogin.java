@@ -1,7 +1,9 @@
 package com.daumont.vasi.vasi.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -68,9 +70,25 @@ public class ActivityLogin extends AppCompatActivity {
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                login = editText_login.getText().toString();
-                password = editText_password.getText().toString();
-                new Connexion().execute();
+                if (Methodes.internet_diponible(activity)) {
+                    login = editText_login.getText().toString();
+                    password = editText_password.getText().toString();
+                    new Connexion().execute();
+                }else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ActivityLogin.this);
+                    builder.setCancelable(false);
+                    builder.setMessage("Internet n'est pas activé\nVeuillez l'activer.")
+                            .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent intent = new Intent(ActivityLogin.this, ActivityLogin.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            });
+                    builder.create();
+                    builder.show();
+                }
+
 
             }
         });
