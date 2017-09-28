@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -75,6 +76,8 @@ public class Activity_ajouter_cd extends AppCompatActivity {
     private String string_id_album, string_id_artist, string_nom_artist, string_id_user, url_gson, url_gson_titres, url_image;
     private User user;
     private MediaPlayer mediaPlayer;
+    private boolean etat_media_fab;
+    private int position_old;
 
     /**
      * Création de l'activite
@@ -110,11 +113,12 @@ public class Activity_ajouter_cd extends AppCompatActivity {
 
         //Initialisation variables
         list_titres = new ArrayList<>();
+        position_old = 0;
         context = this;
         user = table_user_online.get_user(Integer.parseInt(string_id_user));
         list_preview = new ArrayList<String>();
         mediaPlayer = new MediaPlayer();
-
+        etat_media_fab = false;
         //Initialisation JSON
         //recuperation de l'album
         queue = Volley.newRequestQueue(context);
@@ -178,12 +182,35 @@ public class Activity_ajouter_cd extends AppCompatActivity {
                         final String id_recup = map.get("id");
                         final String info = map.get("info");
 
-                        Snackbar.make(v, "Non disponible", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                        //TODO MEDIA AUDIO
                         try {
-                            mediaPlayer.setDataSource(response.getData().get(position).getPreview());
+                            mediaPlayer.reset();
+                            mediaPlayer.setDataSource(list_preview.get(position));
+                            mediaPlayer.prepare();
 
+                            if (etat_media_fab == false) {
+                                etat_media_fab = true;
+                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                                mediaPlayer.start();
+                                Toast.makeText(Activity_ajouter_cd.this, "Lecture de "+info, Toast.LENGTH_SHORT).show();
+                            }
+
+
+                            if (position == position_old) {
+                                etat_media_fab = false;
+                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+                                mediaPlayer.stop();
+
+                            }else{
+                                etat_media_fab = true;
+                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                                mediaPlayer.start();
+                                Toast.makeText(Activity_ajouter_cd.this, "Lecture de "+info, Toast.LENGTH_SHORT).show();
+                            }
+
+
+
+
+                            position_old = position;
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -209,17 +236,24 @@ public class Activity_ajouter_cd extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    Snackbar.make(view, "Non disponible", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
                 try {
-                    String preview = list_preview.get(0);
+                    mediaPlayer.reset();
+                    mediaPlayer.setDataSource(list_preview.get(0));
+                    mediaPlayer.prepare();
+                    if (etat_media_fab == false) {
+                        etat_media_fab = true;
+                        fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                        mediaPlayer.start();
+                    } else {
+                        etat_media_fab = false;
+                        fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+                        mediaPlayer.stop();
+                    }
 
-                    mediaPlayer.setDataSource(preview);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                mediaPlayer.start();
-                //TODO MEDIA AUDIO
+
             }
         });
 
@@ -252,6 +286,7 @@ public class Activity_ajouter_cd extends AppCompatActivity {
         intent.putExtras(objetbunble);
         startActivity(intent);
         overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+        mediaPlayer.stop();
         finish();
     }
 
