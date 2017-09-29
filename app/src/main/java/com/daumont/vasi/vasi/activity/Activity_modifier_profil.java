@@ -96,7 +96,18 @@ public class Activity_modifier_profil extends AppCompatActivity {
         builder.setMessage("Toute modification ne sera pas sauvegardée. Voulez-vous continuer ?")
                 .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        retour();
+                        Intent intent = null;
+                        if(user.getType().equals("admin")){
+                            intent = new Intent(Activity_modifier_profil.this, Activity_administrateur.class);
+                        }else{
+                            intent = new Intent(Activity_modifier_profil.this, Activity_utilisateur.class);
+                        }
+                        Bundle objetbunble = new Bundle();
+                        objetbunble.putString("id_user", string_id_user);
+                        intent.putExtras(objetbunble);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+                        finish();
                     }
                 })
                 .setNegativeButton("Non", new DialogInterface.OnClickListener() {
@@ -111,9 +122,22 @@ public class Activity_modifier_profil extends AppCompatActivity {
 
     public void info_dialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(Activity_modifier_profil.this);
+        builder.setCancelable(false);
         builder.setMessage(message)
-                .setPositiveButton("Retour", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Retour au menu principal", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+
+                        Intent intent = null;
+                        if(user.getType().equals("admin")){
+                            intent = new Intent(Activity_modifier_profil.this, Activity_administrateur.class);
+                        }else{
+                            intent = new Intent(Activity_modifier_profil.this, Activity_utilisateur.class);
+                        }
+                        Bundle objetbunble = new Bundle();
+                        objetbunble.putString("id_user", string_id_user);
+                        intent.putExtras(objetbunble);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
                         finish();
                     }
                 });

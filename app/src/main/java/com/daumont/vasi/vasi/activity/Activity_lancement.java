@@ -54,8 +54,6 @@ public class Activity_lancement extends AppCompatActivity {
             //réveil de la base de donnéese BACK4APP
             table_user_online = new Table_user_online(this);
             table_cd_online = new Table_cd_online(this);
-            //Table_emprunt table_emprunt = new Table_emprunt(this);
-            // table_emprunt.add_emprunt(new Emprunt(100,101,101));
 
             new Handler().postDelayed(new Runnable() {
                 @Override
