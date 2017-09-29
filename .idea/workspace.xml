@@ -12,19 +12,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7ad1ebb6-d650-4113-a308-39663ad96b5f" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/Methodes.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/Methodes.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/ActivityLogin.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/ActivityLogin.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_administrateur.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_administrateur.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_utilisateur.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_utilisateur.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_album_details.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_album_details.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_cd.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_cd.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_lancement.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_lancement.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_modifier_profil.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_modifier_profil.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_rechercher_album.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_rechercher_album.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_rechercher_artiste.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_rechercher_artiste.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_utilisateur.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_utilisateur.java" />
     </list>
     <ignored path="VASI.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -60,46 +48,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Activity_emprunter_cd.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_cd.java">
+      <file leaf-file-name="Activity_administrateur.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_administrateur.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
-              <caret line="217" column="0" selection-start-line="213" selection-start-column="6" selection-end-line="217" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Activity_emprunter_album_details.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_album_details.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="159" column="24" selection-start-line="159" selection-start-column="24" selection-end-line="159" selection-end-column="24" />
+            <state relative-caret-position="-1849">
+              <caret line="510" column="40" selection-start-line="510" selection-start-column="40" selection-end-line="510" selection-end-column="40" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Activity_details_utilisateur.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_utilisateur.java">
+      <file leaf-file-name="Activity_ajouter_cd.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="667">
-              <caret line="251" column="12" selection-start-line="251" selection-start-column="12" selection-end-line="251" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Activity.java" pinned="false" current-in-tab="false">
-        <entry file="file://C:/Android/sdk/sources/android-25/android/app/Activity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="5223" column="16" selection-start-line="5223" selection-start-column="16" selection-end-line="5223" selection-end-column="16" />
+            <state relative-caret-position="364">
+              <caret line="285" column="27" selection-start-line="285" selection-start-column="27" selection-end-line="285" selection-end-column="27" />
               <folding>
-                <element signature="e#222668#222669#0" expanded="true" />
-                <element signature="e#222722#222723#0" expanded="true" />
+                <element signature="e#7767#9777#0" expanded="true" />
+                <element signature="e#9776#9777#0" expanded="true" />
+                <element signature="e#10048#10923#0" expanded="true" />
+                <element signature="e#10922#10923#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -108,61 +76,8 @@
       <file leaf-file-name="Activity_details_cd.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="548">
-              <caret line="388" column="14" selection-start-line="384" selection-start-column="8" selection-end-line="388" selection-end-column="14" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Activity_ajouter_utilisateur.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_utilisateur.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="395">
-              <caret line="147" column="8" selection-start-line="147" selection-start-column="8" selection-end-line="151" selection-end-column="14" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Activity_ajouter_cd.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="99" column="24" selection-start-line="99" selection-start-column="24" selection-end-line="99" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Activity_administrateur.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_administrateur.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6991">
-              <caret line="558" column="39" selection-start-line="558" selection-start-column="12" selection-end-line="558" selection-end-column="39" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Activity_modifier_profil.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_modifier_profil.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="109" column="33" selection-start-line="109" selection-start-column="33" selection-end-line="109" selection-end-column="33" />
-              <folding>
-                <element signature="e#5539#6442#0" expanded="true" />
-                <element signature="e#6441#6442#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Activity_lancement.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_lancement.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="440">
-              <caret line="74" column="98" selection-start-line="74" selection-start-column="98" selection-end-line="74" selection-end-column="98" />
+            <state relative-caret-position="154">
+              <caret line="217" column="98" selection-start-line="217" selection-start-column="19" selection-end-line="217" selection-end-column="98" />
               <folding />
             </state>
           </provider>
@@ -2220,8 +2135,8 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_album_details.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_utilisateur.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_administrateur.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java" />
       </list>
     </option>
   </component>
@@ -2748,7 +2663,14 @@
       <option name="project" value="LOCAL" />
       <updated>1506714486280</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="correctif connexion 1">
+      <created>1506716292575</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1506716292575</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView">
@@ -2837,7 +2759,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="correctif modif mdp" />
-    <option name="LAST_COMMIT_MESSAGE" value="correctif modif mdp" />
+    <MESSAGE value="correctif connexion 1" />
+    <option name="LAST_COMMIT_MESSAGE" value="correctif connexion 1" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -3280,17 +3203,9 @@
         <state relative-caret-position="282">
           <caret line="5223" column="16" selection-start-line="5223" selection-start-column="16" selection-end-line="5223" selection-end-column="16" />
           <folding>
-            <element signature="e#222668#222669#0" expanded="true" />
-            <element signature="e#222722#222723#0" expanded="true" />
+            <element signature="e#222668#222669#0" expanded="false" />
+            <element signature="e#222722#222723#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="548">
-          <caret line="388" column="14" selection-start-line="384" selection-start-column="8" selection-end-line="388" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3302,19 +3217,32 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="99" column="24" selection-start-line="99" selection-start-column="24" selection-end-line="99" selection-end-column="24" />
+        <state relative-caret-position="154">
+          <caret line="217" column="98" selection-start-line="217" selection-start-column="19" selection-end-line="217" selection-end-column="98" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_administrateur.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6991">
-          <caret line="558" column="39" selection-start-line="558" selection-start-column="12" selection-end-line="558" selection-end-column="39" />
+        <state relative-caret-position="-1849">
+          <caret line="510" column="40" selection-start-line="510" selection-start-column="40" selection-end-line="510" selection-end-column="40" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="285" column="27" selection-start-line="285" selection-start-column="27" selection-end-line="285" selection-end-column="27" />
+          <folding>
+            <element signature="e#7767#9777#0" expanded="true" />
+            <element signature="e#9776#9777#0" expanded="true" />
+            <element signature="e#10048#10923#0" expanded="true" />
+            <element signature="e#10922#10923#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
