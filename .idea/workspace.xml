@@ -2646,6 +2646,14 @@
       <option name="presentableId" value="Default" />
       <updated>1496044720844</updated>
     </task>
+    <task id="LOCAL-00001" summary="correctif modif mdp">
+      <created>1506714454622</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1506714454622</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TodoView">
@@ -2731,6 +2739,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="correctif modif mdp" />
+    <option name="LAST_COMMIT_MESSAGE" value="correctif modif mdp" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
