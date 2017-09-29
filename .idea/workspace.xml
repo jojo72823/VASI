@@ -10,9 +10,8 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="No Filters" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7ad1ebb6-d650-4113-a308-39663ad96b5f" name="Default" comment="">
+    <list default="true" id="7ad1ebb6-d650-4113-a308-39663ad96b5f" name="Default" comment="correctif add media ajout cd&#10;">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_ajouter_cd.java" />
     </list>
     <ignored path="VASI.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -2670,7 +2669,14 @@
       <option name="project" value="LOCAL" />
       <updated>1506716292575</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="correctif add media ajout cd&#10;">
+      <created>1506716808417</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1506716808417</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TodoView">
@@ -2760,7 +2766,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="correctif modif mdp" />
     <MESSAGE value="correctif connexion 1" />
-    <option name="LAST_COMMIT_MESSAGE" value="correctif connexion 1" />
+    <MESSAGE value="correctif add media ajout cd&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="correctif add media ajout cd&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
