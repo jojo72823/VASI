@@ -382,20 +382,27 @@ public class Activity_details_cd extends AppCompatActivity {
     }
 
     public void retour() {
-        Intent intent = null;
-        User user = table_user_online.get_user(Integer.parseInt(string_id_user));
-        if (user.getType().equals("admin")) {
-            intent = new Intent(Activity_details_cd.this, Activity_administrateur.class);
-        } else {
-            intent = new Intent(Activity_details_cd.this, Activity_utilisateur.class);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            Intent intent = null;
+            User user = table_user_online.get_user(Integer.parseInt(string_id_user));
+            if (user.getType().equals("admin")) {
+                intent = new Intent(Activity_details_cd.this, Activity_administrateur.class);
+            } else {
+                intent = new Intent(Activity_details_cd.this, Activity_utilisateur.class);
+            }
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_user", string_id_user);
+            intent.putExtras(objetbunble);
+            startActivity(intent);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            mediaPlayer.stop();
+            finish();
         }
-        Bundle objetbunble = new Bundle();
-        objetbunble.putString("id_user", string_id_user);
-        intent.putExtras(objetbunble);
-        startActivity(intent);
-        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-        mediaPlayer.stop();
-        finish();
+
     }
 
 

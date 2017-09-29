@@ -1,5 +1,6 @@
 package com.daumont.vasi.vasi.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -84,6 +85,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     private CD mon_cd;
     private String string_id_album, string_id_artist,string_nom_artist,string_id_user,string_qr_code,string_id_cd;
     private String url_gson, url_gson_titres, url_image;
+    private Activity activity;
 
     /**
      * Permet de naviguer entre les différents onglets grâce au menu du bas
@@ -155,6 +157,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
         //Initialisation variables
         context = this;
         list_titres = new ArrayList<>();
+        activity = this;
 
         //Initialisation JSON
         queue_titres = Volley.newRequestQueue(context);
@@ -293,15 +296,22 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     }
 
     public void retour(){
-        Intent i = new Intent(Activity_emprunter_album_details.this, Activity_emprunter_cd.class);
-        Bundle objetbunble = new Bundle();
-        objetbunble.putString("id_cd", string_id_cd);
-        objetbunble.putString("id_user", "" + string_id_user);
-        objetbunble.putString("qr_code", "" + string_qr_code);
-        i.putExtras(objetbunble);
-        startActivity(i);
-        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-        finish();
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            Intent i = new Intent(Activity_emprunter_album_details.this, Activity_emprunter_cd.class);
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_cd", string_id_cd);
+            objetbunble.putString("id_user", "" + string_id_user);
+            objetbunble.putString("qr_code", "" + string_qr_code);
+            i.putExtras(objetbunble);
+            startActivity(i);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            finish();
+        }
+
     }
 
 

@@ -1,5 +1,6 @@
 package com.daumont.vasi.vasi.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.deezer.GsonRequest;
 import com.daumont.vasi.vasi.deezer.List_Album;
@@ -48,6 +50,7 @@ public class Activity_rechercher_album extends AppCompatActivity {
     //Autres
     private String string_id_artist;
     private String nom_artist,string_id_user;
+    private Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,7 @@ public class Activity_rechercher_album extends AppCompatActivity {
         //Initialization
         context = this.getBaseContext();
         list_album = new List_Album();
+        activity = this;
 
         //Recuperation parametres
         Bundle objetbunble = this.getIntent().getExtras();
@@ -139,12 +143,19 @@ public class Activity_rechercher_album extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(Activity_rechercher_album.this, Activity_rechercher_artiste.class);
-        Bundle objetbunble = new Bundle();
-        objetbunble.putString("id_user", string_id_user);
-        intent.putExtras(objetbunble);
-        startActivity(intent);
-        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-        finish();
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            Intent intent = new Intent(Activity_rechercher_album.this, Activity_rechercher_artiste.class);
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_user", string_id_user);
+            intent.putExtras(objetbunble);
+            startActivity(intent);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            finish();
+        }
+
     }
 }

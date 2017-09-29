@@ -1,5 +1,6 @@
 package com.daumont.vasi.vasi.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,6 +25,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
 import com.daumont.vasi.vasi.database.Table_user_online;
@@ -75,6 +77,7 @@ public class Activity_ajouter_cd extends AppCompatActivity {
     private String string_id_album, string_id_artist, string_nom_artist, string_id_user, url_gson, url_gson_titres, url_image;
     private User user;
     private MediaPlayer mediaPlayer;
+    private Activity activity;
 
     /**
      * Création de l'activite
@@ -94,6 +97,7 @@ public class Activity_ajouter_cd extends AppCompatActivity {
         listView_titres = (ListView) view_content.findViewById(R.id.listView_titres);
         fab = (FloatingActionButton) findViewById(R.id.fab_lecture);
         listView_titres.setNestedScrollingEnabled(true);
+        activity = this;
 
         //Recuperation parametres
         Bundle objetbunble = this.getIntent().getExtras();
@@ -244,15 +248,22 @@ public class Activity_ajouter_cd extends AppCompatActivity {
      * Fonction pour retourner à l'activité précédente
      */
     public void retour() {
-        Intent intent = new Intent(Activity_ajouter_cd.this, Activity_rechercher_album.class);
-        Bundle objetbunble = new Bundle();
-        objetbunble.putString("id_artist", string_id_artist);
-        objetbunble.putString("nom_artist", string_nom_artist);
-        objetbunble.putString("id_user", string_id_user);
-        intent.putExtras(objetbunble);
-        startActivity(intent);
-        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-        finish();
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            Intent intent = new Intent(Activity_ajouter_cd.this, Activity_rechercher_album.class);
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_artist", string_id_artist);
+            objetbunble.putString("nom_artist", string_nom_artist);
+            objetbunble.putString("id_user", string_id_user);
+            intent.putExtras(objetbunble);
+            startActivity(intent);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            finish();
+        }
+
     }
 
     /**
@@ -260,49 +271,63 @@ public class Activity_ajouter_cd extends AppCompatActivity {
      * @param message
      */
     private void info_dialog(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_cd.this);
-        builder.setCancelable(false);
-        builder.setMessage(message)
-                .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        table_cd_online.add_cd(mon_cd);
-                        Intent intent = null;
-                        if(user.getType().equals("admin")){
-                            intent = new Intent(Activity_ajouter_cd.this, Activity_administrateur.class);
-                        }else{
-                            intent = new Intent(Activity_ajouter_cd.this, Activity_utilisateur.class);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_cd.this);
+            builder.setCancelable(false);
+            builder.setMessage(message)
+                    .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            table_cd_online.add_cd(mon_cd);
+                            Intent intent = null;
+                            if(user.getType().equals("admin")){
+                                intent = new Intent(Activity_ajouter_cd.this, Activity_administrateur.class);
+                            }else{
+                                intent = new Intent(Activity_ajouter_cd.this, Activity_utilisateur.class);
+                            }
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_user", string_id_user);
+                            intent.putExtras(objetbunble);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+                            finish();
                         }
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_user", string_id_user);
-                        intent.putExtras(objetbunble);
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-                        finish();
-                    }
-                });
+                    });
 
-        builder.create();
-        builder.show();
+            builder.create();
+            builder.show();
+        }
+
     }
 
     /**
      * Afficher un dialog pour confirmer l'action
      */
     public void confirmation() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_cd.this);
-        builder.setCancelable(false);
-        builder.setMessage("Voulez-vous ajouter le CD à la CDThèque ?")
-                .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        info_dialog("CD ajouté à la CDThèque");
-                    }
-                })
-                .setNegativeButton("Non", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_cd.this);
+            builder.setCancelable(false);
+            builder.setMessage("Voulez-vous ajouter le CD à la CDThèque ?")
+                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            info_dialog("CD ajouté à la CDThèque");
+                        }
+                    })
+                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
-                    }
-                });
-        builder.create();
-        builder.show();
+                        }
+                    });
+            builder.create();
+            builder.show();
+        }
+
     }
 }

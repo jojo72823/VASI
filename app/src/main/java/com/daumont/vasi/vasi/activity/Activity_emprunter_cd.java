@@ -2,6 +2,7 @@ package com.daumont.vasi.vasi.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
@@ -189,15 +190,15 @@ public class Activity_emprunter_cd extends AppCompatActivity {
             if (result.getContents() == null) {
                 Toast.makeText(this, "Aucun QRCode trouvé", Toast.LENGTH_LONG).show();
             } else {
-                qr_code_album =  result.getContents();
+                qr_code_album = result.getContents();
                 Toast.makeText(this, "Numéro album : " + result.getContents(), Toast.LENGTH_LONG).show();
                 cd_emprunt = table_cd_online.get_cd(Integer.parseInt(qr_code_album));
-                if(Integer.parseInt(string_id_user) == (cd_emprunt.getId_proprio())){
+                if (Integer.parseInt(string_id_user) == (cd_emprunt.getId_proprio())) {
                     info_dialog("Ce cd vous appartient. Vous ne pouvez l'emprunter");
-                }else{
-                    if(table_emprunt.album_emprunter(qr_code_album)){
+                } else {
+                    if (table_emprunt.album_emprunter(qr_code_album)) {
                         info_dialog("Ce CD est déjà emprunté");
-                    }else{
+                    } else {
                         confirmation();
                     }
                 }
@@ -210,19 +211,27 @@ public class Activity_emprunter_cd extends AppCompatActivity {
     }
 
     public void retour() {
-        Intent intent = null;
-        User user = table_user_online.get_user(Integer.parseInt(string_id_user));
-        if(user.getType().equals("admin")){
-            intent = new Intent(Activity_emprunter_cd.this, Activity_administrateur.class);
-        }else{
-            intent = new Intent(Activity_emprunter_cd.this, Activity_utilisateur.class);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+
+        } else {
+            Intent intent = null;
+            User user = table_user_online.get_user(Integer.parseInt(string_id_user));
+            if (user.getType().equals("admin")) {
+                intent = new Intent(Activity_emprunter_cd.this, Activity_administrateur.class);
+            } else {
+                intent = new Intent(Activity_emprunter_cd.this, Activity_utilisateur.class);
+            }
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_user", "" + string_id_user);
+            intent.putExtras(objetbunble);
+            startActivity(intent);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            finish();
         }
-        Bundle objetbunble = new Bundle();
-        objetbunble.putString("id_user", "" + string_id_user);
-        intent.putExtras(objetbunble);
-        startActivity(intent);
-        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-        finish();
+
     }
 
     private void info_dialog(String message) {
@@ -238,15 +247,14 @@ public class Activity_emprunter_cd extends AppCompatActivity {
     }
 
 
-
     public void confirmation() {
         /**ON DEMANDE CONFIRMATION*****************************************/
         CD cd = table_cd_online.get_cd(cd_emprunt.getQr_code());
         AlertDialog.Builder builder = new AlertDialog.Builder(Activity_emprunter_cd.this);
-        builder.setMessage("Voulez-vous envoyer une demande d'emprunt pour l'album "+ cd.getNom_album()+"-"+cd.getNom_artist()+"?")
+        builder.setMessage("Voulez-vous envoyer une demande d'emprunt pour l'album " + cd.getNom_album() + "-" + cd.getNom_artist() + "?")
                 .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        table_emprunt.add_emprunt(new Emprunt(cd_emprunt.getId_proprio(),Integer.parseInt(string_id_user),cd_emprunt.getQr_code(),"demande"));
+                        table_emprunt.add_emprunt(new Emprunt(cd_emprunt.getId_proprio(), Integer.parseInt(string_id_user), cd_emprunt.getQr_code(), "demande"));
                         info_dialog("Demande d'emprunt envoyée");
                     }
                 })

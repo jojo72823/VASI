@@ -1,5 +1,6 @@
 package com.daumont.vasi.vasi.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
+import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
 import com.daumont.vasi.vasi.database.Table_user_online;
@@ -60,7 +62,7 @@ public class Activity_rechercher_artiste extends AppCompatActivity {
     //Autres
     private String string_id_user;
     private User user;
-
+    private Activity activity;
     /**
      * Création de l'activité
      * @param savedInstanceState
@@ -83,6 +85,7 @@ public class Activity_rechercher_artiste extends AppCompatActivity {
         searchView.requestFocusFromTouch();
         toolbar.setTitle("");
 
+
         //Recuperation parametres
         Bundle objetbunble = this.getIntent().getExtras();
         if (objetbunble != null) {
@@ -93,6 +96,7 @@ public class Activity_rechercher_artiste extends AppCompatActivity {
 
         //Initialisation variables
         context = this;
+        activity = this;
         deezer_request = new Deezer_request(context);
         queue = Volley.newRequestQueue(this);
         user = table_user_online.get_user(Integer.parseInt(string_id_user));
@@ -179,18 +183,24 @@ public class Activity_rechercher_artiste extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-
-        Intent intent = null;
-        if(user.getType().equals("admin")){
-            intent = new Intent(Activity_rechercher_artiste.this, Activity_administrateur.class);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
         }else{
-            intent = new Intent(Activity_rechercher_artiste.this, Activity_utilisateur.class);
+            Intent intent = null;
+            if(user.getType().equals("admin")){
+                intent = new Intent(Activity_rechercher_artiste.this, Activity_administrateur.class);
+            }else{
+                intent = new Intent(Activity_rechercher_artiste.this, Activity_utilisateur.class);
+            }
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_user", string_id_user);
+            intent.putExtras(objetbunble);
+            startActivity(intent);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            finish();
         }
-        Bundle objetbunble = new Bundle();
-        objetbunble.putString("id_user", string_id_user);
-        intent.putExtras(objetbunble);
-        startActivity(intent);
-        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-        finish();
+
     }
 }

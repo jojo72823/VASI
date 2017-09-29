@@ -72,7 +72,7 @@ public class Activity_lancement extends AppCompatActivity {
             builder.setMessage("Internet n'est pas activé\nVeuillez l'activer.")
                     .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            Intent intent = new Intent(Activity_lancement.this, ActivityLogin.class);
+                            Intent intent = new Intent(Activity_lancement.this, Activity_lancement.class);
                             startActivity(intent);
                             finish();
                         }

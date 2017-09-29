@@ -1,10 +1,13 @@
 package com.daumont.vasi.vasi.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 
 import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
+import com.daumont.vasi.vasi.database.Table_cd_online;
 import com.daumont.vasi.vasi.database.Table_user_online;
 import com.daumont.vasi.vasi.modele.User;
 
@@ -97,20 +101,37 @@ public class ActivityLogin extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            mProgressDialog.setTitle("Veuillez patienter");
-            mProgressDialog.setMessage("Connexion en cours...");
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.show();
+            if (!Methodes.internet_diponible(activity)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setCancelable(false);
+                builder.setMessage("Internet n'est pas activé\nvous avez été déconnecté")
+                        .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(activity, Activity_lancement.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }else{
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setTitle("Veuillez patienter");
+                mProgressDialog.setMessage("Connexion en cours...");
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.show();
+            }
 
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-
-            id_user = table_user_online.connexion_user(login, password);
-            if (id_user != -1) {
-                user = table_user_online.get_user(id_user);
+            if (Methodes.internet_diponible(activity)) {
+                id_user = table_user_online.connexion_user(login, password);
+                if (id_user != -1) {
+                    user = table_user_online.get_user(id_user);
+                }
             }
 
 
@@ -120,38 +141,38 @@ public class ActivityLogin extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-            //Recuperation de l'id ou non de l'utilisateur
-            if (id_user != -1) {//si on recupere un id pour l'utilisateur
-                mProgressDialog.hide();
-                if (user.getType().equals("admin")) {//on charge une session admin
-                    Intent intent = new Intent(activity, Activity_administrateur.class);
-                    Bundle objetbunble = new Bundle();
-                    //On passe en parametre l'id utilisateur
-                    objetbunble.putString("id_user", "" + id_user);
-                    objetbunble.putString("notification", "yes");
-                    intent.putExtras(objetbunble);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                    finish();
-                } else {//on charge une session classique
+            if (Methodes.internet_diponible(activity)) {
+                //Recuperation de l'id ou non de l'utilisateur
+                if (id_user != -1) {//si on recupere un id pour l'utilisateur
+                    mProgressDialog.hide();
+                    if (user.getType().equals("admin")) {//on charge une session admin
+                        Intent intent = new Intent(activity, Activity_administrateur.class);
+                        Bundle objetbunble = new Bundle();
+                        //On passe en parametre l'id utilisateur
+                        objetbunble.putString("id_user", "" + id_user);
+                        objetbunble.putString("notification", "yes");
+                        intent.putExtras(objetbunble);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        finish();
+                    } else {//on charge une session classique
 
 
-                    Intent intent = new Intent(activity, Activity_utilisateur.class);
-                    //On passe en parametre l'id utilisateur
-                    Bundle objetbunble = new Bundle();
-                    objetbunble.putString("id_user", "" + id_user);
-                    objetbunble.putString("notification", "yes");
-                    intent.putExtras(objetbunble);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                    finish();
-                }
-            } else {//n'exisste pas on incremente le nombre d'essai
-                mProgressDialog.hide();
+                        Intent intent = new Intent(activity, Activity_utilisateur.class);
+                        //On passe en parametre l'id utilisateur
+                        Bundle objetbunble = new Bundle();
+                        objetbunble.putString("id_user", "" + id_user);
+                        objetbunble.putString("notification", "yes");
+                        intent.putExtras(objetbunble);
+                        startActivity(intent);
+                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        finish();
+                    }
+                } else {//n'exisste pas on incremente le nombre d'essai
+
+                    mProgressDialog.hide();
                     Methodes.info_dialog("Le compte n'existe pas ou le mot de passe est incorrect", activity);
-
-
-
+                }
             }
         }
     }

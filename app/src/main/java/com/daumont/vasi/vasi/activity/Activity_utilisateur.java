@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
 import com.daumont.vasi.vasi.database.Table_emprunt;
@@ -555,66 +556,83 @@ public class Activity_utilisateur extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(activity);
-            mProgressDialog.setTitle("Veuillez patienter");
-            mProgressDialog.setMessage("Chargement en cours...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.show();
+            if (!Methodes.internet_diponible(activity)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setCancelable(false);
+                builder.setMessage("Internet n'est pas activé\nvous avez été déconnecté")
+                        .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(activity, Activity_lancement.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                builder.create();
+                builder.show();
+            }else{
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setTitle("Veuillez patienter");
+                mProgressDialog.setMessage("Connexion en cours...");
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.show();
+            }
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            user = table_user_online.get_user(Integer.parseInt(string_id_user));
-            list_cd_theque = table_cd_online.list_cd();
-            list_cd_utilisateur = table_cd_online.list_cd_utilistaeur(Integer.parseInt(string_id_user));
-            list_demande_emprunt = table_emprunt.demande_emprunt(Integer.parseInt(string_id_user));
-
+            if (Methodes.internet_diponible(activity)) {
+                user = table_user_online.get_user(Integer.parseInt(string_id_user));
+                list_cd_theque = table_cd_online.list_cd();
+                list_cd_utilisateur = table_cd_online.list_cd_utilistaeur(Integer.parseInt(string_id_user));
+                list_demande_emprunt = table_emprunt.demande_emprunt(Integer.parseInt(string_id_user));
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
+            if (Methodes.internet_diponible(activity)) {
+                mProgressDialog.hide();
+                toolbar.setTitle("Bienvenue " + user.getIdentifiant());
+                //Initialisation des listes
+                for (int i = 0; i < list_cd_theque.size(); i++) {
+                    map_cd_theque = new HashMap<>();
+                    map_cd_theque.put("id", "" + list_cd_theque.get(i).getId_cd());
+                    map_cd_theque.put("info", list_cd_theque.get(i).getNom_artist() + " - " + list_cd_theque.get(i).getNom_album());//champ id
+                    map_cd_theque.put("image", list_cd_theque.get(i).getImage());//champ id
 
-            mProgressDialog.hide();
-            toolbar.setTitle("Bienvenue " + user.getIdentifiant());
-            //Initialisation des listes
-            for (int i = 0; i < list_cd_theque.size(); i++) {
-                map_cd_theque = new HashMap<>();
-                map_cd_theque.put("id", "" + list_cd_theque.get(i).getId_cd());
-                map_cd_theque.put("info", list_cd_theque.get(i).getNom_artist() + " - " + list_cd_theque.get(i).getNom_album());//champ id
-                map_cd_theque.put("image", list_cd_theque.get(i).getImage());//champ id
-
-                listItem_cd_theque.add(map_cd_theque);
-            }
-            for (int i = 0; i < list_cd_utilisateur.size(); i++) {
-                map_cd_user = new HashMap<>();
-                map_cd_user.put("id", "" + list_cd_utilisateur.get(i).getId_cd());
-                map_cd_user.put("info", list_cd_utilisateur.get(i).getNom_artist() + " - " + list_cd_utilisateur.get(i).getNom_album());//champ id
-                map_cd_user.put("image", list_cd_utilisateur.get(i).getImage());//champ id
-                listItem_cd_user.add(map_cd_user);
-            }
-
-            for (int i = 0; i < list_demande_emprunt.size(); i++) {
-                map_demande_emprunt = new HashMap<>();
-                map_demande_emprunt.put("id", "" + list_demande_emprunt.get(i).getId_emprunt());
-                User user_demandeur = table_user_online.get_user(list_demande_emprunt.get(i).getId_emprunteur());
-                CD cd_tmp = table_cd_online.get_cd(list_demande_emprunt.get(i).getQr_code());
-                map_demande_emprunt.put("titre", cd_tmp.getNom_artist() + " - " + cd_tmp.getNom_album());
-                map_demande_emprunt.put("demandeur", "Demande par " + user_demandeur.getIdentifiant());
-                map_demande_emprunt.put("image", cd_tmp.getImage());
-                listItem_demande_emprunt.add(map_demande_emprunt);
-            }
-
-            load_navigation_menu();//Chargement de la listView
-
-            if (!etat_notif.equals("rien")) {
-
-                if (list_demande_emprunt.size() != 0) {
-                    affichage_demande_emprunt();
+                    listItem_cd_theque.add(map_cd_theque);
+                }
+                for (int i = 0; i < list_cd_utilisateur.size(); i++) {
+                    map_cd_user = new HashMap<>();
+                    map_cd_user.put("id", "" + list_cd_utilisateur.get(i).getId_cd());
+                    map_cd_user.put("info", list_cd_utilisateur.get(i).getNom_artist() + " - " + list_cd_utilisateur.get(i).getNom_album());//champ id
+                    map_cd_user.put("image", list_cd_utilisateur.get(i).getImage());//champ id
+                    listItem_cd_user.add(map_cd_user);
                 }
 
-            }
+                for (int i = 0; i < list_demande_emprunt.size(); i++) {
+                    map_demande_emprunt = new HashMap<>();
+                    map_demande_emprunt.put("id", "" + list_demande_emprunt.get(i).getId_emprunt());
+                    User user_demandeur = table_user_online.get_user(list_demande_emprunt.get(i).getId_emprunteur());
+                    CD cd_tmp = table_cd_online.get_cd(list_demande_emprunt.get(i).getQr_code());
+                    map_demande_emprunt.put("titre", cd_tmp.getNom_artist() + " - " + cd_tmp.getNom_album());
+                    map_demande_emprunt.put("demandeur", "Demande par " + user_demandeur.getIdentifiant());
+                    map_demande_emprunt.put("image", cd_tmp.getImage());
+                    listItem_demande_emprunt.add(map_demande_emprunt);
+                }
 
+                load_navigation_menu();//Chargement de la listView
+
+                if (!etat_notif.equals("rien")) {
+
+                    if (list_demande_emprunt.size() != 0) {
+                        affichage_demande_emprunt();
+                    }
+
+                }
+            }
         }
 
     }

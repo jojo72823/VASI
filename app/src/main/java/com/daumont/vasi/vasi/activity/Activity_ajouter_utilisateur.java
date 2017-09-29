@@ -145,27 +145,34 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_utilisateur.this);
-        builder.setCancelable(false);
-        builder.setMessage("Voulez vous abandonner la création du compte ?")
-                .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(Activity_ajouter_utilisateur.this, Activity_administrateur.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_user", string_id_user);
-                        intent.putExtras(objetbunble);
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-                        finish();
-                    }
-                })
-                .setNegativeButton("Non", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_utilisateur.this);
+            builder.setCancelable(false);
+            builder.setMessage("Voulez vous abandonner la création du compte ?")
+                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(Activity_ajouter_utilisateur.this, Activity_administrateur.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_user", string_id_user);
+                            intent.putExtras(objetbunble);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
-                    }
-                });
-        builder.create();
-        builder.show();
+                        }
+                    });
+            builder.create();
+            builder.show();
+        }
+
     }
 
 
