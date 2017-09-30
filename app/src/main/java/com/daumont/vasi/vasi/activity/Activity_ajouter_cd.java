@@ -20,12 +20,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
@@ -73,6 +75,7 @@ public class Activity_ajouter_cd extends AppCompatActivity {
     private RequestQueue queue, queue_titres;
     private GsonRequest<Album> gsonRequest_album;
     private GsonRequest<List_title> gsonRequest_titles;
+
     //autres
     private CD mon_cd;
     private String string_id_album, string_id_artist, string_nom_artist, string_id_user, url_gson, url_gson_titres, url_image;
@@ -81,6 +84,7 @@ public class Activity_ajouter_cd extends AppCompatActivity {
     private Activity activity;
     private boolean etat_media_fab;
     private int position_old;
+    private String first_title;
 
     /**
      * Création de l'activite
@@ -90,6 +94,7 @@ public class Activity_ajouter_cd extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        activity = this;
         //Recuperation des elements visuels
         setContentView(R.layout.activity_ajouter_cd);
         view_content = findViewById(R.id.content_ajouter_cd);
@@ -100,174 +105,195 @@ public class Activity_ajouter_cd extends AppCompatActivity {
         listView_titres = (ListView) view_content.findViewById(R.id.listView_titres);
         fab = (FloatingActionButton) findViewById(R.id.fab_lecture);
         listView_titres.setNestedScrollingEnabled(true);
-        activity = this;
 
-        //Recuperation parametres
-        Bundle objetbunble = this.getIntent().getExtras();
-        if (objetbunble != null) {
-            string_id_album = objetbunble.getString("id_album");
-            string_id_artist = objetbunble.getString("id_artist");
-            string_nom_artist = objetbunble.getString("nom_artist");
-            string_id_user = objetbunble.getString("id_user");
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            //Recuperation parametres
+            Bundle objetbunble = this.getIntent().getExtras();
+            if (objetbunble != null) {
+                string_id_album = objetbunble.getString("id_album");
+                string_id_artist = objetbunble.getString("id_artist");
+                string_nom_artist = objetbunble.getString("nom_artist");
+                string_id_user = objetbunble.getString("id_user");
+            }
+
+            //Initialisation bd
+            table_cd_online = new Table_cd_online(this);
+            table_user_online = new Table_user_online(this);
+
+            //Initialisation variables
+            list_titres = new ArrayList<>();
+            etat_media_fab = false;
+            position_old = 0;
+            context = this;
+            user = table_user_online.get_user(Integer.parseInt(string_id_user));
+            list_preview = new ArrayList<String>();
+            mediaPlayer = new MediaPlayer();
+
+            //Initialisation JSON
+            //recuperation de l'album
+            queue = Volley.newRequestQueue(context);
+            url_gson = "https://api.deezer.com/album/" + string_id_album;
+            gsonRequest_album = new GsonRequest<Album>(
+                    url_gson, Album.class, null, new Response.Listener<Album>() {
+                @Override
+                public void onResponse(final Album response) {
+                    try {
+                        Picasso.with(imageView_cd.getContext()).load(response.getCoverBig()).centerCrop().fit().into(imageView_cd);
+                        imageView_cd.setColorFilter(Color.parseColor("#7F000000"));
+                        url_image = response.getCoverSmall();
+                        mon_cd = new CD(Integer.parseInt(response.getId()), response.getTitle(), response.getArtist().getName(), Integer.parseInt(string_id_user), response.getCoverMedium());
+                        toolbar_layout.setTitle(mon_cd.getNom_artist() + " - " + mon_cd.getNom_album());
+                    } catch (Exception e) {
+                        retour();
+                    }
+                }
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+            queue.add(gsonRequest_album);
+            //recuperation des titres de l'album
+            queue_titres = Volley.newRequestQueue(context);
+            url_gson_titres = "https://api.deezer.com/album/" + string_id_album + "/tracks";
+            gsonRequest_titles = new GsonRequest<>(
+                    url_gson_titres, List_title.class, null, new Response.Listener<List_title>() {
+                @Override
+                public void onResponse(final List_title response) {
+                    for (int i = 0; i < response.getData().size(); i++) {
+                        map_titres = new HashMap<>();
+                        map_titres.put("id", "" + response.getData().get(i).getId());
+                        map_titres.put("info", ""+response.getData().get(i).getTitle());
+                        listItem_titres.add(map_titres);
+                        list_preview.add(response.getData().get(i).getPreview());
+                    }
+                    first_title=response.getData().get(0).getTitle();
+                    SimpleAdapter mSchedule = new SimpleAdapter(context,
+                            listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
+                        public View getView(int position, View convertView, ViewGroup parent) {
+
+                            HashMap<String, String> map = (HashMap<String, String>) listView_titres
+                                    .getItemAtPosition(position);
+                            View view = super.getView(position, convertView, parent);
+                            ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
+                            TextView textView_sous_titre = (TextView) view.findViewById(R.id.textView_info_sous_titre);
+                            textView_sous_titre.setText("Par "+response.getData().get(0).getArtist().getName());
+                            Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
+                            //ImageView imageView_anim = (ImageView) view.findViewById(R.id.imageView_anim);
+                           // Glide.with(activity).load(R.drawable.anim).into(imageView_anim);
+                            return view;
+                        }
+                    };
+                    listView_titres.setAdapter(mSchedule);
+
+                    listView_titres.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                        public void onItemClick(AdapterView<?> a, View v, int position,
+                                                long id) {
+                            HashMap<String, String> map = (HashMap<String, String>) listView_titres
+                                    .getItemAtPosition(position);
+                            final String id_recup = map.get("id");
+                            final String info = map.get("info");
+
+                            try {
+                                mediaPlayer.reset();
+                                mediaPlayer.setDataSource(list_preview.get(position));
+                                mediaPlayer.prepare();
+
+                                if (etat_media_fab == false) {
+                                    etat_media_fab = true;
+                                    fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                                    mediaPlayer.start();
+                                    Toast.makeText(activity, "Lecture de "+info, Toast.LENGTH_LONG).show();
+                                   // ImageView imageView_anim = (ImageView) v.findViewById(R.id.imageView_anim);
+                                  //  imageView_anim.setVisibility(View.VISIBLE);
+                                }
+
+
+                                if (position == position_old) {
+                                    etat_media_fab = false;
+                                    fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+                                    mediaPlayer.stop();
+                                  //  ImageView imageView_anim = (ImageView) v.findViewById(R.id.imageView_anim);
+                                  ///  imageView_anim.setVisibility(View.GONE);
+
+                                }else{
+                                    etat_media_fab = true;
+                                    fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                                    mediaPlayer.start();
+                                    Toast.makeText(activity, "Lecture de "+info, Toast.LENGTH_LONG).show();
+                                  //  ImageView imageView_anim = (ImageView) v.findViewById(R.id.imageView_anim);
+                                    //imageView_anim.setVisibility(View.VISIBLE);
+                                }
+
+
+
+
+                                position_old = position;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                Toast.makeText(context, "Un problème est survenu", Toast.LENGTH_SHORT).show();
+                            }
+                            mediaPlayer.start();
+
+                        }
+
+                    });
+
+
+                }
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+            queue_titres.add(gsonRequest_titles);
+
+
+            //Listeners
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        mediaPlayer.reset();
+                        mediaPlayer.setDataSource(list_preview.get(0));
+                        mediaPlayer.prepare();
+                        if (etat_media_fab == false) {
+                            etat_media_fab = true;
+                            fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                            mediaPlayer.start();
+                            Toast.makeText(activity, "Lecture de "+first_title, Toast.LENGTH_LONG).show();
+                        } else {
+                            etat_media_fab = false;
+                            fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+                            mediaPlayer.stop();
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "Un problème est survenu", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
+
+            button_ajouter_cd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    confirmation();
+                }
+            });
         }
 
-        //Initialisation bd
-        table_cd_online = new Table_cd_online(this);
-        table_user_online = new Table_user_online(this);
 
-        //Initialisation variables
-        list_titres = new ArrayList<>();
-        etat_media_fab = false;
-        position_old = 0;
-        context = this;
-        user = table_user_online.get_user(Integer.parseInt(string_id_user));
-        list_preview = new ArrayList<String>();
-        mediaPlayer = new MediaPlayer();
-
-        //Initialisation JSON
-        //recuperation de l'album
-        queue = Volley.newRequestQueue(context);
-        url_gson = "https://api.deezer.com/album/" + string_id_album;
-        gsonRequest_album = new GsonRequest<Album>(
-                url_gson, Album.class, null, new Response.Listener<Album>() {
-            @Override
-            public void onResponse(final Album response) {
-                try {
-                    Picasso.with(imageView_cd.getContext()).load(response.getCoverBig()).centerCrop().fit().into(imageView_cd);
-                    imageView_cd.setColorFilter(Color.parseColor("#7F000000"));
-                    url_image = response.getCoverSmall();
-                    mon_cd = new CD(Integer.parseInt(response.getId()), response.getTitle(), response.getArtist().getName(), Integer.parseInt(string_id_user), response.getCoverMedium());
-                    toolbar_layout.setTitle(mon_cd.getNom_artist() + " - " + mon_cd.getNom_album());
-                } catch (Exception e) {
-                    retour();
-                }
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-        queue.add(gsonRequest_album);
-        //recuperation des titres de l'album
-        queue_titres = Volley.newRequestQueue(context);
-        url_gson_titres = "https://api.deezer.com/album/" + string_id_album + "/tracks";
-        gsonRequest_titles = new GsonRequest<>(
-                url_gson_titres, List_title.class, null, new Response.Listener<List_title>() {
-            @Override
-            public void onResponse(final List_title response) {
-                for (int i = 0; i < response.getData().size(); i++) {
-                    map_titres = new HashMap<>();
-                    map_titres.put("id", "" + response.getData().get(i).getId());
-                    map_titres.put("info", "" + (i+1)+" - "+response.getData().get(i).getTitle());
-                    listItem_titres.add(map_titres);
-                    list_preview.add(response.getData().get(i).getPreview());
-                }
-                SimpleAdapter mSchedule = new SimpleAdapter(context,
-                        listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
-                    public View getView(int position, View convertView, ViewGroup parent) {
-
-                        HashMap<String, String> map = (HashMap<String, String>) listView_titres
-                                .getItemAtPosition(position);
-                        View view = super.getView(position, convertView, parent);
-                        ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
-                        Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
-                        return view;
-                    }
-                };
-                listView_titres.setAdapter(mSchedule);
-
-                listView_titres.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    public void onItemClick(AdapterView<?> a, View v, int position,
-                                            long id) {
-                        HashMap<String, String> map = (HashMap<String, String>) listView_titres
-                                .getItemAtPosition(position);
-                        final String id_recup = map.get("id");
-                        final String info = map.get("info");
-
-                        try {
-                            mediaPlayer.reset();
-                            mediaPlayer.setDataSource(list_preview.get(position));
-                            mediaPlayer.prepare();
-
-                            if (etat_media_fab == false) {
-                                etat_media_fab = true;
-                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-                                mediaPlayer.start();
-                                Toast.makeText(activity, "Lecture de "+info, Toast.LENGTH_SHORT).show();
-                            }
-
-
-                            if (position == position_old) {
-                                etat_media_fab = false;
-                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
-                                mediaPlayer.stop();
-
-                            }else{
-                                etat_media_fab = true;
-                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-                                mediaPlayer.start();
-                                Toast.makeText(activity, "Lecture de "+info, Toast.LENGTH_SHORT).show();
-                            }
-
-
-
-
-                            position_old = position;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        mediaPlayer.start();
-
-                    }
-
-                });
-
-
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-        queue_titres.add(gsonRequest_titles);
-
-
-        //Listeners
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    mediaPlayer.reset();
-                    mediaPlayer.setDataSource(list_preview.get(0));
-                    mediaPlayer.prepare();
-                    if (etat_media_fab == false) {
-                        etat_media_fab = true;
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-                        mediaPlayer.start();
-                    } else {
-                        etat_media_fab = false;
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
-                        mediaPlayer.stop();
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-
-        button_ajouter_cd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                confirmation();
-            }
-        });
     }
 
 

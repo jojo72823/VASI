@@ -34,6 +34,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
@@ -97,6 +98,7 @@ public class Activity_details_cd extends AppCompatActivity {
     private Activity activity;
     private boolean etat_media_fab;
     private int position_old;
+    private String first_title;
 
     /**
      * Permet de naviguer entre les différents onglets grâce au menu du bas
@@ -194,102 +196,119 @@ public class Activity_details_cd extends AppCompatActivity {
             id_cd = objetbunble.getString("id_cd");
             string_id_user = objetbunble.getString("id_user");
         }
-        //Initialisation bdd
-        table_cd_online = new Table_cd_online(this);
-        table_user_online = new Table_user_online(this);
-        //Initialisation variables
-        mediaPlayer = new MediaPlayer();
-        context = this;
-        list_titres = new ArrayList<>();
-        list_preview = new ArrayList<>();
-        etat_media_fab = false;
-        liste_view = new ArrayList<>();
-        position_old = 0;
-        //Initialisation JSON
-        queue_titres = Volley.newRequestQueue(context);
-        url_gson_titres = "https://api.deezer.com/album/" + id_cd + "/tracks";
-        gsonRequest_titles = new GsonRequest<>(
-                url_gson_titres, List_title.class, null, new Response.Listener<List_title>() {
-            @Override
-            public void onResponse(final List_title response) {
-                for (int i = 0; i < response.getData().size(); i++) {
-                    map_titres = new HashMap<>();
-                    map_titres.put("id", "" + response.getData().get(i).getId());
-                    map_titres.put("info", "" + (i+1)+" - "+response.getData().get(i).getTitle());
-                    listItem_titres.add(map_titres);
-                    list_preview.add(response.getData().get(i).getPreview());
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            //Initialisation bdd
+            table_cd_online = new Table_cd_online(this);
+            table_user_online = new Table_user_online(this);
+            //Initialisation variables
+            mediaPlayer = new MediaPlayer();
+            context = this;
+            list_titres = new ArrayList<>();
+            list_preview = new ArrayList<>();
+            etat_media_fab = false;
+            liste_view = new ArrayList<>();
+            position_old = 0;
+            //Initialisation JSON
+            queue_titres = Volley.newRequestQueue(context);
+            url_gson_titres = "https://api.deezer.com/album/" + id_cd + "/tracks";
+            gsonRequest_titles = new GsonRequest<>(
+                    url_gson_titres, List_title.class, null, new Response.Listener<List_title>() {
+                @Override
+                public void onResponse(final List_title response) {
+                    for (int i = 0; i < response.getData().size(); i++) {
+                        map_titres = new HashMap<>();
+                        map_titres.put("id", "" + response.getData().get(i).getId());
+                        map_titres.put("info", ""+response.getData().get(i).getTitle());
+                        listItem_titres.add(map_titres);
+                        list_preview.add(response.getData().get(i).getPreview());
+                    }
+                    first_title=response.getData().get(0).getTitle();
+                    SimpleAdapter mSchedule = new SimpleAdapter(context,
+                            listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
+                        public View getView(int position, View convertView, ViewGroup parent) {
+
+                            HashMap<String, String> map = (HashMap<String, String>) listView_titres
+                                    .getItemAtPosition(position);
+                            View view = super.getView(position, convertView, parent);
+                            liste_view.add(view);
+                            ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
+                            TextView textView_sous_titre = (TextView) view.findViewById(R.id.textView_info_sous_titre);
+                            textView_sous_titre.setText("Par "+response.getData().get(0).getArtist().getName());
+                            Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
+
+                            ImageView imageView_anim = (ImageView) view.findViewById(R.id.imageView_anim);
+                            Glide.with(activity).load(R.drawable.anim).into(imageView_anim);
+
+
+                            return view;
+                        }
+                    };
+                    listView_titres.setAdapter(mSchedule);
+                    listView_titres.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                        public void onItemClick(AdapterView<?> a, View v, int position,
+                                                long id) {
+                            HashMap<String, String> map = (HashMap<String, String>) listView_titres
+                                    .getItemAtPosition(position);
+                            final String id_recup = map.get("id");
+                            final String info = map.get("info");
+
+                            try {
+                                mediaPlayer.reset();
+                                mediaPlayer.setDataSource(list_preview.get(position));
+                                mediaPlayer.prepare();
+
+                                if (etat_media_fab == false) {
+                                    etat_media_fab = true;
+                                    fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                                    mediaPlayer.start();
+                                    Toast.makeText(Activity_details_cd.this, "Lecture de "+info, Toast.LENGTH_LONG).show();
+                                }
+
+
+                                if (position == position_old) {
+                                    etat_media_fab = false;
+                                    fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+                                    mediaPlayer.stop();
+
+                                }else{
+                                    etat_media_fab = true;
+                                    fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                                    mediaPlayer.start();
+                                    Toast.makeText(Activity_details_cd.this, "Lecture de "+info, Toast.LENGTH_LONG).show();
+                                }
+
+
+
+
+                                position_old = position;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            mediaPlayer.start();
+                        }
+
+                    });
+
+
                 }
 
-                SimpleAdapter mSchedule = new SimpleAdapter(context,
-                        listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
-                    public View getView(int position, View convertView, ViewGroup parent) {
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
 
-                        HashMap<String, String> map = (HashMap<String, String>) listView_titres
-                                .getItemAtPosition(position);
-                        View view = super.getView(position, convertView, parent);
-                        liste_view.add(view);
-                        ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
-                        Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
-                        return view;
-                    }
-                };
-                listView_titres.setAdapter(mSchedule);
-                listView_titres.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    public void onItemClick(AdapterView<?> a, View v, int position,
-                                            long id) {
-                        HashMap<String, String> map = (HashMap<String, String>) listView_titres
-                                .getItemAtPosition(position);
-                        final String id_recup = map.get("id");
-                        final String info = map.get("info");
-
-                        try {
-                            mediaPlayer.reset();
-                            mediaPlayer.setDataSource(list_preview.get(position));
-                            mediaPlayer.prepare();
-
-                            if (etat_media_fab == false) {
-                                etat_media_fab = true;
-                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-                                mediaPlayer.start();
-                                Toast.makeText(Activity_details_cd.this, "Lecture de "+info, Toast.LENGTH_SHORT).show();
-                            }
-
-
-                            if (position == position_old) {
-                                etat_media_fab = false;
-                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
-                                mediaPlayer.stop();
-
-                            }else{
-                                etat_media_fab = true;
-                                fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-                                mediaPlayer.start();
-                                Toast.makeText(Activity_details_cd.this, "Lecture de "+info, Toast.LENGTH_SHORT).show();
-                            }
+                }
+            });
+            queue_titres.add(gsonRequest_titles);
+        }
 
 
 
 
-                            position_old = position;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        mediaPlayer.start();
-                    }
-
-                });
-
-
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-        queue_titres.add(gsonRequest_titles);
 
 
         Bitmap bitmap = Methodes.generateQRBitmap(id_cd);
@@ -312,30 +331,36 @@ public class Activity_details_cd extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_suppression:
+                        if (!Methodes.internet_diponible(activity)) {
+                            Intent intent = new Intent(activity, Activity_lancement.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            /**ON DEMANDE CONFIRMATION*****************************************/
+                            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_details_cd.this);
+                            builder.setCancelable(false);
+                            builder.setMessage("Etes-vous sûr de vouloir supprimer l'album de la CDthèque ?")
+                                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            if (mon_cd.getId_proprio() == Integer.parseInt(string_id_user)) {
+                                                table_cd_online.delete_cd(mon_cd.getId_cd());
+                                                retour();
+                                            } else {
+                                                Methodes.info_dialog("Vous n'êtes pas le propriétaire vous ne pouvez pas le supprimer", activity);
+                                            }
 
-                        /**ON DEMANDE CONFIRMATION*****************************************/
-                        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_details_cd.this);
-                        builder.setCancelable(false);
-                        builder.setMessage("Etes-vous sûr de vouloir supprimer l'album de la CDthèque ?")
-                                .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        if (mon_cd.getId_proprio() == Integer.parseInt(string_id_user)) {
-                                            table_cd_online.delete_cd(mon_cd.getId_cd());
-                                            retour();
-                                        } else {
-                                            Methodes.info_dialog("Vous n'êtes pas le propriétaire vous ne pouvez pas le supprimer", activity);
+
                                         }
+                                    })
+                                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
 
+                                        }
+                                    });
+                            builder.create();
+                            builder.show();
+                        }
 
-                                    }
-                                })
-                                .setNegativeButton("Non", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-
-                                    }
-                                });
-                        builder.create();
-                        builder.show();
                         return true;
 
 
@@ -349,23 +374,32 @@ public class Activity_details_cd extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    mediaPlayer.reset();
-                    mediaPlayer.setDataSource(list_preview.get(0));
-                    mediaPlayer.prepare();
-                    if (etat_media_fab == false) {
-                        etat_media_fab = true;
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
-                        mediaPlayer.start();
-                    } else {
-                        etat_media_fab = false;
-                        fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
-                        mediaPlayer.stop();
-                    }
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    try {
+                        mediaPlayer.reset();
+                        mediaPlayer.setDataSource(list_preview.get(0));
+                        mediaPlayer.prepare();
+                        if (etat_media_fab == false) {
+                            etat_media_fab = true;
+                            fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_pause));
+                            mediaPlayer.start();
+                            Toast.makeText(activity, "Lecture de "+first_title, Toast.LENGTH_LONG).show();
+                        } else {
+                            etat_media_fab = false;
+                            fab.setImageDrawable(getResources().getDrawable(R.drawable.icon_play));
+                            mediaPlayer.stop();
+                        }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(Activity_details_cd.this, "Un problème est survenu", Toast.LENGTH_SHORT).show();
+                    }
                 }
+
 
             }
         });

@@ -150,7 +150,7 @@ public class Activity_utilisateur extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        activity = this;
         //Recuperation des elements visuels
         setContentView(R.layout.activity_utilisateur);
         listView = (ListView) findViewById(R.id.listView_user);
@@ -178,31 +178,101 @@ public class Activity_utilisateur extends AppCompatActivity {
                 etat_notif = "rien";
             }
         }
-        //Connexion bdd
-        table_user_online = new Table_user_online(this);
-        table_cd_online = new Table_cd_online(this);
-        table_emprunt = new Table_emprunt(this);
 
-        //Initialisation variables
-        position_infos = true;
-        toolbar.inflateMenu(R.menu.menu_profil);
-        list_demande_emprunt = new ArrayList<>();
-        listItem_cd_theque = new ArrayList<>();
-        listItem_demande_emprunt = new ArrayList<>();
-        listItem_cd_user = new ArrayList<>();
-        activity = this;
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        } else {
+            //Connexion bdd
+            table_user_online = new Table_user_online(this);
+            table_cd_online = new Table_cd_online(this);
+            table_emprunt = new Table_emprunt(this);
 
-        //Appel du chargement
-        new Chargement().execute();
+            //Initialisation variables
+            position_infos = true;
+            toolbar.inflateMenu(R.menu.menu_profil);
+            list_demande_emprunt = new ArrayList<>();
+            listItem_cd_theque = new ArrayList<>();
+            listItem_demande_emprunt = new ArrayList<>();
+            listItem_cd_user = new ArrayList<>();
 
+
+            //Appel du chargement
+            new Chargement().execute();
+        }
 
 
         // Listeners
         fab_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (position_infos) {
-                    affichage_demande_emprunt();
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    if (position_infos) {
+                        affichage_demande_emprunt();
+                    } else {
+                        Intent i = new Intent(Activity_utilisateur.this, Activity_rechercher_artiste.class);
+                        Bundle objetbunble = new Bundle();
+                        objetbunble.putString("id_user", string_id_user);
+                        i.putExtras(objetbunble);
+                        Activity_utilisateur.this.startActivity(i);
+                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                    }
+                }
+
+            }
+        });
+        button_emprunter_un_cd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Intent i = new Intent(Activity_utilisateur.this, Activity_emprunter_cd.class);
+                    Bundle objetbunble = new Bundle();
+                    objetbunble.putString("id_user", string_id_user);
+                    i.putExtras(objetbunble);
+                    Activity_utilisateur.this.startActivity(i);
+                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                    finish();
+                }
+
+            }
+        });
+
+
+        button_rendre_cd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    IntentIntegrator integrator = new IntentIntegrator(activity);
+                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                    integrator.setPrompt("Veuillez scanner l'album");
+                    integrator.setCameraId(0);
+                    integrator.setBeepEnabled(false);
+                    integrator.setBarcodeImageEnabled(false);
+                    integrator.initiateScan();
+                }
+
+            }
+        });
+        button_ajouter_cd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
                 } else {
                     Intent i = new Intent(Activity_utilisateur.this, Activity_rechercher_artiste.class);
                     Bundle objetbunble = new Bundle();
@@ -211,49 +281,14 @@ public class Activity_utilisateur extends AppCompatActivity {
                     Activity_utilisateur.this.startActivity(i);
                     overridePendingTransition(R.anim.pull_in, R.anim.push_out);
                 }
-            }
-        });
-        button_emprunter_un_cd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Activity_utilisateur.this, Activity_emprunter_cd.class);
-                Bundle objetbunble = new Bundle();
-                objetbunble.putString("id_user", string_id_user);
-                i.putExtras(objetbunble);
-                Activity_utilisateur.this.startActivity(i);
-                overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                finish();
-            }
-        });
 
-
-        button_rendre_cd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                IntentIntegrator integrator = new IntentIntegrator(activity);
-                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                integrator.setPrompt("Veuillez scanner l'album");
-                integrator.setCameraId(0);
-                integrator.setBeepEnabled(false);
-                integrator.setBarcodeImageEnabled(false);
-                integrator.initiateScan();
-            }
-        });
-        button_ajouter_cd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Activity_utilisateur.this, Activity_rechercher_artiste.class);
-                Bundle objetbunble = new Bundle();
-                objetbunble.putString("id_user", string_id_user);
-                i.putExtras(objetbunble);
-                Activity_utilisateur.this.startActivity(i);
-                overridePendingTransition(R.anim.pull_in, R.anim.push_out);
             }
         });
 
         button_voir_demande_emprunt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 affichage_demande_emprunt();
             }
         });
@@ -261,23 +296,31 @@ public class Activity_utilisateur extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(new android.support.v7.widget.Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_modifier_mot_de_passe:
-                        Intent i = new Intent(Activity_utilisateur.this, Activity_modifier_profil.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_user", string_id_user);
-                        i.putExtras(objetbunble);
-                        Activity_utilisateur.this.startActivity(i);
-                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                        return true;
+
+                    switch (item.getItemId()) {
+                        case R.id.action_modifier_mot_de_passe:
+                            if (!Methodes.internet_diponible(activity)) {
+                                Intent intent = new Intent(activity, Activity_lancement.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Intent i = new Intent(Activity_utilisateur.this, Activity_modifier_profil.class);
+                                Bundle objetbunble = new Bundle();
+                                objetbunble.putString("id_user", string_id_user);
+                                i.putExtras(objetbunble);
+                                Activity_utilisateur.this.startActivity(i);
+                                overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                            }
+                            return true;
 
 
-                    default:
-                        return false;
-                }
+                        default:
+                            return false;
+                    }
+
+
             }
         });
-
 
 
         //Listener sur la listView
@@ -285,20 +328,27 @@ public class Activity_utilisateur extends AppCompatActivity {
 
             public void onItemClick(AdapterView<?> a, View v, int position,
                                     long id) {
-                HashMap<String, String> map = (HashMap<String, String>) listView
-                        .getItemAtPosition(position);
-                if(!map.get("id").equals("null")){
-                    if (position_vue == 2 || position_vue == 3) {
-                        Intent i = new Intent(Activity_utilisateur.this, Activity_details_cd.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_cd", map.get("id"));
-                        objetbunble.putString("id_user", "" + string_id_user);
-                        i.putExtras(objetbunble);
-                        startActivity(i);
-                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                        finish();
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    HashMap<String, String> map = (HashMap<String, String>) listView
+                            .getItemAtPosition(position);
+                    if (!map.get("id").equals("null")) {
+                        if (position_vue == 2 || position_vue == 3) {
+                            Intent i = new Intent(Activity_utilisateur.this, Activity_details_cd.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_cd", map.get("id"));
+                            objetbunble.putString("id_user", "" + string_id_user);
+                            i.putExtras(objetbunble);
+                            startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                            finish();
+                        }
                     }
                 }
+
 
             }
 
@@ -313,7 +363,7 @@ public class Activity_utilisateur extends AppCompatActivity {
     public void load_navigation_menu() {
         listView.setVisibility(View.GONE);
         linearLayout_menu.setVisibility(View.VISIBLE);
-        position_vue=0;
+        position_vue = 0;
 
     }
 
@@ -321,7 +371,7 @@ public class Activity_utilisateur extends AppCompatActivity {
      * Charge la list des CD emprunter
      */
     public void load_navigation_cd_empruntesr() {
-        position_vue=1;
+        position_vue = 1;
         listView.setVisibility(View.VISIBLE);
         linearLayout_menu.setVisibility(View.GONE);
 
@@ -347,7 +397,7 @@ public class Activity_utilisateur extends AppCompatActivity {
      * Charge la list de la CDTheque
      */
     public void load_navigation_cd_theque() {
-        position_vue=2;
+        position_vue = 2;
         listView.setVisibility(View.VISIBLE);
         linearLayout_menu.setVisibility(View.GONE);
 
@@ -378,24 +428,31 @@ public class Activity_utilisateur extends AppCompatActivity {
     }
 
     public void retour() {
-        /**ON DEMANDE CONFIRMATION*****************************************/
-        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
-        builder.setMessage("Vous allez être déconnecté. Voulez-vous continuer ?")
-                .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent intent = new Intent(Activity_utilisateur.this, ActivityLogin.class);
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-                        finish();
-                    }
-                })
-                .setNegativeButton("Non", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        } else {
+            /**ON DEMANDE CONFIRMATION*****************************************/
+            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
+            builder.setMessage("Vous allez être déconnecté. Voulez-vous continuer ?")
+                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(Activity_utilisateur.this, ActivityLogin.class);
+                            startActivity(intent);
+                            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
-                    }
-                });
-        builder.create();
-        builder.show();
+                        }
+                    });
+            builder.create();
+            builder.show();
+        }
+
     }
 
 
@@ -407,149 +464,176 @@ public class Activity_utilisateur extends AppCompatActivity {
      * @param data
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        } else {
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if (result != null) {
+                if (result.getContents() == null) {
 
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() == null) {
-
-                info_dialog("Aucun QRCode détecté");
-            } else {
-                if (table_emprunt.album_terminer_emprunt(result.getContents(), string_id_user)) {
-                    //TODO améliorer le visuel du dialog
-                    CD cd = table_cd_online.get_cd(result.getContents());
-                    info_dialog("Numéro album : " + result.getContents() + "\nCD rendu");
-                    info_dialog("Veuillez rendre le CD "+cd.getNom_album()+" - "+cd.getNom_artist());
+                    info_dialog("Aucun QRCode détecté");
                 } else {
-                    info_dialog("Problème rencontré");
+                    if (table_emprunt.album_terminer_emprunt(result.getContents(), string_id_user)) {
+                        //TODO améliorer le visuel du dialog
+                        CD cd = table_cd_online.get_cd(result.getContents());
+                        info_dialog("Numéro album : " + result.getContents() + "\nCD rendu");
+                        info_dialog("Veuillez rendre le CD " + cd.getNom_album() + " - " + cd.getNom_artist());
+                    } else {
+                        info_dialog("Problème rencontré");
+                    }
+
                 }
+            } else {
+                super.onActivityResult(requestCode, resultCode, data);
 
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-
         }
+
+
     }
 
     public void affichage_demande_emprunt() {
-
-        int taille = table_emprunt.demande_emprunt_size(Integer.parseInt(string_id_user));
-
-        if (list_demande_emprunt.size() != taille) {
-            //On vide le contenu
-            list_demande_emprunt.clear();
-            listItem_demande_emprunt.clear();
-            //on va mettre à jour la list de demande d'emprunt
-            list_demande_emprunt = table_emprunt.demande_emprunt(Integer.parseInt(string_id_user));
-            for (int i = 0; i < list_demande_emprunt.size(); i++) {
-                map_demande_emprunt = new HashMap<>();
-                map_demande_emprunt.put("id", "" + list_demande_emprunt.get(i).getId_emprunt());
-                User user_demandeur = table_user_online.get_user(list_demande_emprunt.get(i).getId_emprunteur());
-                CD cd_tmp = table_cd_online.get_cd(list_demande_emprunt.get(i).getQr_code());
-                map_demande_emprunt.put("titre", cd_tmp.getNom_artist() + " - " + cd_tmp.getNom_album());
-                map_demande_emprunt.put("demandeur", "Demande envoyée par " + user_demandeur.getIdentifiant());
-                map_demande_emprunt.put("image", cd_tmp.getImage());
-                listItem_demande_emprunt.add(map_demande_emprunt);
-            }
-        }
-
-        if (list_demande_emprunt.size() == 0) {
-            info_dialog("Aucune demande");
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
         } else {
-            LayoutInflater factory = LayoutInflater.from(Activity_utilisateur.this);
-            final View alertDialogView = factory.inflate(R.layout.dialog_demande_emprunt, null);
-            AlertDialog.Builder adb = new AlertDialog.Builder(Activity_utilisateur.this);
-            Button button_close = (Button) alertDialogView.findViewById(R.id.button_close);
-            final ListView listView_emprunt = (ListView) alertDialogView.findViewById(R.id.listView_emprunt);
-            adb.setView(alertDialogView);
-            listView_emprunt.setAdapter(null);
-            SimpleAdapter mSchedule = new SimpleAdapter(this.getBaseContext(),
-                    listItem_demande_emprunt, R.layout.layout_cd_demande_emprunt, new String[]{"titre"}, new int[]{R.id.textView_info_cd}) {
-                public View getView(int position, View convertView, ViewGroup parent) {
+            int taille = table_emprunt.demande_emprunt_size(Integer.parseInt(string_id_user));
 
-                    HashMap<String, String> map = (HashMap<String, String>) listView_emprunt
-                            .getItemAtPosition(position);
-                    final String url_image = map.get("image");
-
-                    View view = super.getView(position, convertView, parent);
-                    ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_cd);
-                    TextView textView_demandeur = (TextView) view.findViewById(R.id.textView_demandeur);
-                    textView_demandeur.setText(map.get("demandeur"));
-                    Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
-                    return view;
+            if (list_demande_emprunt.size() != taille) {
+                //On vide le contenu
+                list_demande_emprunt.clear();
+                listItem_demande_emprunt.clear();
+                //on va mettre à jour la list de demande d'emprunt
+                list_demande_emprunt = table_emprunt.demande_emprunt(Integer.parseInt(string_id_user));
+                for (int i = 0; i < list_demande_emprunt.size(); i++) {
+                    map_demande_emprunt = new HashMap<>();
+                    map_demande_emprunt.put("id", "" + list_demande_emprunt.get(i).getId_emprunt());
+                    User user_demandeur = table_user_online.get_user(list_demande_emprunt.get(i).getId_emprunteur());
+                    CD cd_tmp = table_cd_online.get_cd(list_demande_emprunt.get(i).getQr_code());
+                    map_demande_emprunt.put("titre", cd_tmp.getNom_artist() + " - " + cd_tmp.getNom_album());
+                    map_demande_emprunt.put("demandeur", "Demande envoyée par " + user_demandeur.getIdentifiant());
+                    map_demande_emprunt.put("image", cd_tmp.getImage());
+                    listItem_demande_emprunt.add(map_demande_emprunt);
                 }
-            };
-            listView_emprunt.setAdapter(mSchedule);
+            }
 
-            listView_emprunt.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            if (list_demande_emprunt.size() == 0) {
+                info_dialog("Aucune demande");
+            } else {
+                LayoutInflater factory = LayoutInflater.from(Activity_utilisateur.this);
+                final View alertDialogView = factory.inflate(R.layout.dialog_demande_emprunt, null);
+                AlertDialog.Builder adb = new AlertDialog.Builder(Activity_utilisateur.this);
+                Button button_close = (Button) alertDialogView.findViewById(R.id.button_close);
+                final ListView listView_emprunt = (ListView) alertDialogView.findViewById(R.id.listView_emprunt);
+                adb.setView(alertDialogView);
+                listView_emprunt.setAdapter(null);
+                SimpleAdapter mSchedule = new SimpleAdapter(this.getBaseContext(),
+                        listItem_demande_emprunt, R.layout.layout_cd_demande_emprunt, new String[]{"titre"}, new int[]{R.id.textView_info_cd}) {
+                    public View getView(int position, View convertView, ViewGroup parent) {
 
-                public void onItemClick(AdapterView<?> a, View v, int position,
-                                        long id) {
-                    HashMap<String, String> map = (HashMap<String, String>) listView_emprunt
-                            .getItemAtPosition(position);
+                        HashMap<String, String> map = (HashMap<String, String>) listView_emprunt
+                                .getItemAtPosition(position);
+                        final String url_image = map.get("image");
 
-                    String id_emprunt = map.get("id");
-                    confirmation(id_emprunt, alertDialog);
+                        View view = super.getView(position, convertView, parent);
+                        ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_cd);
+                        TextView textView_demandeur = (TextView) view.findViewById(R.id.textView_demandeur);
+                        textView_demandeur.setText(map.get("demandeur"));
+                        Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
+                        return view;
+                    }
+                };
+                listView_emprunt.setAdapter(mSchedule);
 
-                }
+                listView_emprunt.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            });
+                    public void onItemClick(AdapterView<?> a, View v, int position,
+                                            long id) {
+                        HashMap<String, String> map = (HashMap<String, String>) listView_emprunt
+                                .getItemAtPosition(position);
+
+                        String id_emprunt = map.get("id");
+                        confirmation(id_emprunt, alertDialog);
+
+                    }
+
+                });
 
 
-            TextView textTitre;
-            textTitre = (TextView) alertDialogView.findViewById(R.id.textTitre);
-            textTitre.setText("Demande de prêt");
-            alertDialog = adb.show();
-            button_close.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    alertDialog.dismiss();
-                }
-            });
+                TextView textTitre;
+                textTitre = (TextView) alertDialogView.findViewById(R.id.textTitre);
+                textTitre.setText("Demande de prêt");
+                alertDialog = adb.show();
+                button_close.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
+                    }
+                });
+            }
+
         }
 
 
     }
 
     public void confirmation(final String p_id_emprunt, final AlertDialog alertDialog) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
-        builder.setMessage("Voulez vous validez l'emprunt ?")
-                .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Emprunt emprunt_tmp = table_emprunt.get_emprunt(Integer.parseInt(p_id_emprunt));
-                        emprunt_tmp.setEtat_emprunt("preter");
-                        table_emprunt.changer_etat_emprunt(emprunt_tmp);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        } else {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
+            builder.setMessage("Voulez vous validez l'emprunt ?")
+                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Emprunt emprunt_tmp = table_emprunt.get_emprunt(Integer.parseInt(p_id_emprunt));
+                            emprunt_tmp.setEtat_emprunt("preter");
+                            table_emprunt.changer_etat_emprunt(emprunt_tmp);
 
-                        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
-                        builder.setMessage("Emprunt accepté.\nN'oubliez pas de donner le CD.")
-                                .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        alertDialog.dismiss();
-                                    }
-                                });
-                        builder.create();
-                        builder.show();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
+                            builder.setMessage("Emprunt accepté.\nN'oubliez pas de donner le CD.")
+                                    .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            alertDialog.dismiss();
+                                        }
+                                    });
+                            builder.create();
+                            builder.show();
 
 
-                    }
-                })
-                .setNegativeButton("Non", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                        }
+                    })
+                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
-                    }
-                });
-        builder.create();
-        builder.show();
+                        }
+                    });
+            builder.create();
+            builder.show();
+        }
+
 
     }
 
     private void info_dialog(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
-        builder.setMessage(message)
-                .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                    }
-                });
-        builder.create();
-        builder.show();
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
+            builder.setMessage(message)
+                    .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    });
+            builder.create();
+            builder.show();
+        }
+
     }
 
     private class Chargement extends AsyncTask<Void, Void, Void> {
@@ -557,19 +641,12 @@ public class Activity_utilisateur extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             if (!Methodes.internet_diponible(activity)) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                builder.setCancelable(false);
-                builder.setMessage("Internet n'est pas activé\nvous avez été déconnecté")
-                        .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent intent = new Intent(activity, Activity_lancement.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-                builder.create();
-                builder.show();
-            }else{
+
+                Intent intent = new Intent(activity, Activity_lancement.class);
+                startActivity(intent);
+                finish();
+
+            } else {
                 mProgressDialog = new ProgressDialog(activity);
                 mProgressDialog.setTitle("Veuillez patienter");
                 mProgressDialog.setMessage("Connexion en cours...");
@@ -636,7 +713,6 @@ public class Activity_utilisateur extends AppCompatActivity {
         }
 
     }
-
 
 
 }

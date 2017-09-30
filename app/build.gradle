@@ -38,4 +38,6 @@ dependencies {
     compile 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
     compile 'com.elmargomez.typer:typerlib:1.0.0'
     testCompile 'junit:junit:4.12'
+    compile 'com.github.bumptech.glide:glide:3.6.0'
+
 }

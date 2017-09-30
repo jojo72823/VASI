@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -30,25 +31,32 @@ public class Activity_rendre_cd extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        activity = this;
         //Recuperation des elements visuels
         setContentView(R.layout.activity_rendre_cd);
         button_scanner = (Button) findViewById(R.id.button_scanner);
 
         //Initialisation variables
-        activity = this;
+
 
         //LISTENER
         button_scanner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IntentIntegrator integrator = new IntentIntegrator(activity);
-                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                integrator.setPrompt("Veuillez scanner l'album");
-                integrator.setCameraId(0);
-                integrator.setBeepEnabled(false);
-                integrator.setBarcodeImageEnabled(false);
-                integrator.initiateScan();
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    IntentIntegrator integrator = new IntentIntegrator(activity);
+                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                    integrator.setPrompt("Veuillez scanner l'album");
+                    integrator.setCameraId(0);
+                    integrator.setBeepEnabled(false);
+                    integrator.setBarcodeImageEnabled(false);
+                    integrator.initiateScan();
+                }
+
             }
         });
     }
@@ -68,6 +76,7 @@ public class Activity_rendre_cd extends AppCompatActivity {
                 Toast.makeText(this, "erreur scan", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "scann : " + result.getContents(), Toast.LENGTH_LONG).show();
+                //TODO rendre cd
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

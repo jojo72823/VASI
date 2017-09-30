@@ -117,6 +117,7 @@ public class Activity_administrateur extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
 
         //Recuperation des elements visuels
         setContentView(R.layout.activity_administrateur);
@@ -134,8 +135,6 @@ public class Activity_administrateur extends AppCompatActivity {
         listView.setNestedScrollingEnabled(true);
         linearLayout_menu.setNestedScrollingEnabled(true);
 
-
-
         //Recuperation parametres
         Bundle objetbunble = this.getIntent().getExtras();
         if (objetbunble != null) {
@@ -147,38 +146,37 @@ public class Activity_administrateur extends AppCompatActivity {
             }
         }
 
-        //Initialisation bdd
-        table_user_online = new Table_user_online(this);
-        table_cd_online = new Table_cd_online(this);
-        table_emprunt = new Table_emprunt(this);
+        if (Methodes.internet_diponible(this)) {
+            //Initialisation bdd
+            table_user_online = new Table_user_online(this);
+            table_cd_online = new Table_cd_online(this);
+            table_emprunt = new Table_emprunt(this);
+
+        } else {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }
 
         //Initialisation variables
-        activity = this;
         list_demande_emprunt = new ArrayList<>();
         listItem_cd_user = new ArrayList<>();
 
         new Chargement().execute();
 
-
-
-
-
-
         //Listener sur FAB
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (position_vue == 2 || position_vue == 3) {
-                    Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
-                    Bundle objetbunble = new Bundle();
-                    objetbunble.putString("id_user", string_id_user);
-                    i.putExtras(objetbunble);
-                    Activity_administrateur.this.startActivity(i);
-                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
                     finish();
+
                 } else {
-                    if (position_vue == 4) {
-                        Intent i = new Intent(Activity_administrateur.this, Activity_ajouter_utilisateur.class);
+                    if (position_vue == 2 || position_vue == 3) {
+                        Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
                         Bundle objetbunble = new Bundle();
                         objetbunble.putString("id_user", string_id_user);
                         i.putExtras(objetbunble);
@@ -186,9 +184,20 @@ public class Activity_administrateur extends AppCompatActivity {
                         overridePendingTransition(R.anim.pull_in, R.anim.push_out);
                         finish();
                     } else {
-                        affichage_demande_emprunt();
+                        if (position_vue == 4) {
+                            Intent i = new Intent(Activity_administrateur.this, Activity_ajouter_utilisateur.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_user", string_id_user);
+                            i.putExtras(objetbunble);
+                            Activity_administrateur.this.startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                            finish();
+                        } else {
+                            affichage_demande_emprunt();
+                        }
                     }
                 }
+
             }
         });
 
@@ -197,28 +206,38 @@ public class Activity_administrateur extends AppCompatActivity {
 
             public void onItemClick(AdapterView<?> a, View v, int position,
                                     long id) {
-                HashMap<String, String> map = (HashMap<String, String>) listView
-                        .getItemAtPosition(position);
-                if(!map.get("id").equals("null")){
-                    if (position_vue == 2 || position_vue == 3) {
-                        Intent i = new Intent(Activity_administrateur.this, Activity_details_cd.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_cd", map.get("id"));
-                        objetbunble.putString("id_user", "" + string_id_user);
-                        i.putExtras(objetbunble);
-                        Activity_administrateur.this.startActivity(i);
-                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                        finish();
-                    } else {
-                        Intent i = new Intent(Activity_administrateur.this, Activity_details_utilisateur.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_user_select", "" + map.get("id"));
-                        objetbunble.putString("id_user", "" + string_id_user);
-                        i.putExtras(objetbunble);
-                        Activity_administrateur.this.startActivity(i);
-                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    HashMap<String, String> map = (HashMap<String, String>) listView
+                            .getItemAtPosition(position);
+                    if (!map.get("id").equals("null")) {
+                        if (position_vue == 2 || position_vue == 3) {
+                            Intent i = new Intent(Activity_administrateur.this, Activity_details_cd.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_cd", map.get("id"));
+                            objetbunble.putString("id_user", "" + string_id_user);
+                            i.putExtras(objetbunble);
+                            Activity_administrateur.this.startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                            finish();
+                        } else {
+                            Intent i = new Intent(Activity_administrateur.this, Activity_details_utilisateur.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_user_select", "" + map.get("id"));
+                            objetbunble.putString("id_user", "" + string_id_user);
+                            i.putExtras(objetbunble);
+                            Activity_administrateur.this.startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        }
                     }
                 }
+
+
 
             }
 
@@ -230,12 +249,21 @@ public class Activity_administrateur extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_modifier_mot_de_passe:
-                        Intent i = new Intent(Activity_administrateur.this, Activity_modifier_profil.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_user", string_id_user);
-                        i.putExtras(objetbunble);
-                        Activity_administrateur.this.startActivity(i);
-                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        if (!Methodes.internet_diponible(activity)) {
+
+                            Intent intent = new Intent(activity, Activity_lancement.class);
+                            startActivity(intent);
+                            finish();
+
+                        } else {
+                            Intent i = new Intent(Activity_administrateur.this, Activity_modifier_profil.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_user", string_id_user);
+                            i.putExtras(objetbunble);
+                            Activity_administrateur.this.startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        }
+
                         return true;
                     default:
                         return false;
@@ -244,47 +272,82 @@ public class Activity_administrateur extends AppCompatActivity {
         });
 
 
-
         //LISTENER BOUTONS
         button_emprunter_un_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Activity_administrateur.this, Activity_emprunter_cd.class);
-                Bundle objetbunble = new Bundle();
-                objetbunble.putString("id_user", string_id_user);
-                i.putExtras(objetbunble);
-                Activity_administrateur.this.startActivity(i);
-                overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                finish();
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    Intent i = new Intent(Activity_administrateur.this, Activity_emprunter_cd.class);
+                    Bundle objetbunble = new Bundle();
+                    objetbunble.putString("id_user", string_id_user);
+                    i.putExtras(objetbunble);
+                    Activity_administrateur.this.startActivity(i);
+                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                    finish();
+                }
+
             }
         });
         button_rendre_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IntentIntegrator integrator = new IntentIntegrator(activity);
-                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                integrator.setPrompt("Veuillez scanner l'album");
-                integrator.setCameraId(0);
-                integrator.setBeepEnabled(false);
-                integrator.setBarcodeImageEnabled(false);
-                integrator.initiateScan();
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    IntentIntegrator integrator = new IntentIntegrator(activity);
+                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                    integrator.setPrompt("Veuillez scanner l'album");
+                    integrator.setCameraId(0);
+                    integrator.setBeepEnabled(false);
+                    integrator.setBarcodeImageEnabled(false);
+                    integrator.initiateScan();
+                }
+
             }
         });
         button_ajouter_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
-                Bundle objetbunble = new Bundle();
-                objetbunble.putString("id_user", string_id_user);
-                i.putExtras(objetbunble);
-                Activity_administrateur.this.startActivity(i);
-                overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
+                    Bundle objetbunble = new Bundle();
+                    objetbunble.putString("id_user", string_id_user);
+                    i.putExtras(objetbunble);
+                    Activity_administrateur.this.startActivity(i);
+                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                }
+
             }
         });
         button_voir_demande_emprunt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                affichage_demande_emprunt();
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    affichage_demande_emprunt();
+                }
+
             }
         });
     }
@@ -326,7 +389,7 @@ public class Activity_administrateur extends AppCompatActivity {
                 final String url_image = map.get("image");
                 View view = super.getView(position, convertView, parent);
                 ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_cd);
-                if(map.get("id").equals("null")){
+                if (map.get("id").equals("null")) {
                     image_view_cd.setVisibility(View.GONE);
                 }
                 Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
@@ -352,7 +415,7 @@ public class Activity_administrateur extends AppCompatActivity {
                 final String url_image = map.get("image");
                 View view = super.getView(position, convertView, parent);
                 ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_cd);
-                if(map.get("id").equals("null")){
+                if (map.get("id").equals("null")) {
                     image_view_cd.setVisibility(View.GONE);
                 }
                 Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
@@ -557,19 +620,12 @@ public class Activity_administrateur extends AppCompatActivity {
             super.onPreExecute();
 
             if (!Methodes.internet_diponible(activity)) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                builder.setCancelable(false);
-                builder.setMessage("Internet n'est pas activé\nvous avez été déconnecté")
-                        .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent intent = new Intent(activity, Activity_lancement.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                        });
-                builder.create();
-                builder.show();
-            }else{
+
+                Intent intent = new Intent(activity, Activity_lancement.class);
+                startActivity(intent);
+                finish();
+
+            } else {
                 mProgressDialog = new ProgressDialog(activity);
                 mProgressDialog.setTitle("Veuillez patienter");
                 mProgressDialog.setMessage("Connexion en cours...");

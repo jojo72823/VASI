@@ -65,16 +65,30 @@ public class ActivityLogin extends AppCompatActivity {
         mProgressDialog = new ProgressDialog(this);
 
         //DATABASE
-        table_user_online = new Table_user_online(this);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        } else {
+            table_user_online = new Table_user_online(this);
+        }
+
 
 
         //Listener sur bouton
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                login = editText_login.getText().toString();
-                password = editText_password.getText().toString();
-                new Connexion().execute();
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    login = editText_login.getText().toString();
+                    password = editText_password.getText().toString();
+                    new Connexion().execute();
+                }
+
 
             }
         });
@@ -82,14 +96,24 @@ public class ActivityLogin extends AppCompatActivity {
         editText_password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    login = editText_login.getText().toString();
-                    password = editText_password.getText().toString();
-                    new Connexion().execute();
-                    handled = true;
-                }
-                return handled;
+
+                    boolean handled = false;
+                    if (actionId == EditorInfo.IME_ACTION_SEND) {
+                        if (!Methodes.internet_diponible(activity)) {
+                            Intent intent = new Intent(activity, Activity_lancement.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            login = editText_login.getText().toString();
+                            password = editText_password.getText().toString();
+                            new Connexion().execute();
+                            handled = true;
+                        }
+
+                    }
+                    return handled;
+
+
             }
         });
 

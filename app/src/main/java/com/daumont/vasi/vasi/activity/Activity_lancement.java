@@ -47,6 +47,7 @@ public class Activity_lancement extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lancement);
 
+
         //TODO mode en ligne et local
 
         //On test si il y a une connexion internet de disponible
@@ -69,7 +70,7 @@ public class Activity_lancement extends AppCompatActivity {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_lancement.this);
             builder.setCancelable(false);
-            builder.setMessage("Internet n'est pas activé\nVeuillez l'activer.")
+            builder.setMessage("L'application a besoin d'internet pour fonctionner\nVeuillez l'activer")
                     .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             Intent intent = new Intent(Activity_lancement.this, Activity_lancement.class);
