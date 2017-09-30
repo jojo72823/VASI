@@ -75,6 +75,9 @@ public class Activity_utilisateur extends AppCompatActivity {
     private Activity activity;
     private String etat_notif;
     private int position_vue;
+    private CD cd;
+    private boolean etat_changement;
+    private String qrcode;
 
 
     /**
@@ -166,6 +169,7 @@ public class Activity_utilisateur extends AppCompatActivity {
         button_voir_demande_emprunt = (Button) findViewById(R.id.button_voir_demande_emprunt);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         linearLayout_menu.setNestedScrollingEnabled(true);
+        etat_changement = false;
 
 
         //Recuperation parametres
@@ -464,33 +468,28 @@ public class Activity_utilisateur extends AppCompatActivity {
      * @param data
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        } else {
-            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-            if (result != null) {
-                if (result.getContents() == null) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
-                    info_dialog("Aucun QRCode détecté");
-                } else {
-                    if (table_emprunt.album_terminer_emprunt(result.getContents(), string_id_user)) {
-                        //TODO améliorer le visuel du dialog
-                        CD cd = table_cd_online.get_cd(result.getContents());
-                        info_dialog("Numéro album : " + result.getContents() + "\nCD rendu");
-                        info_dialog("Veuillez rendre le CD " + cd.getNom_album() + " - " + cd.getNom_artist());
-                    } else {
-                        info_dialog("Problème rencontré");
-                    }
+        if (result != null) {
+            if (result.getContents() == null) {
 
-                }
+                info_dialog("Aucun QRCode détecté");
+
+                retour();
             } else {
-                super.onActivityResult(requestCode, resultCode, data);
+                qrcode = result.getContents();
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    new RendreCd().execute();
+                }
 
             }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-
 
     }
 
@@ -625,6 +624,7 @@ public class Activity_utilisateur extends AppCompatActivity {
             finish();
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_utilisateur.this);
+            builder.setCancelable(false);
             builder.setMessage(message)
                     .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -673,19 +673,35 @@ public class Activity_utilisateur extends AppCompatActivity {
                 mProgressDialog.hide();
                 toolbar.setTitle("Bienvenue " + user.getIdentifiant());
                 //Initialisation des listes
-                for (int i = 0; i < list_cd_theque.size(); i++) {
-                    map_cd_theque = new HashMap<>();
-                    map_cd_theque.put("id", "" + list_cd_theque.get(i).getId_cd());
-                    map_cd_theque.put("info", list_cd_theque.get(i).getNom_artist() + " - " + list_cd_theque.get(i).getNom_album());//champ id
-                    map_cd_theque.put("image", list_cd_theque.get(i).getImage());//champ id
+                if (list_cd_theque.size() > 0) {
+                    for (int i = 0; i < list_cd_theque.size(); i++) {
+                        map_cd_theque = new HashMap<>();
+                        map_cd_theque.put("id", "" + list_cd_theque.get(i).getId_cd());
+                        map_cd_theque.put("info", list_cd_theque.get(i).getNom_artist() + " - " + list_cd_theque.get(i).getNom_album());//champ id
+                        map_cd_theque.put("image", list_cd_theque.get(i).getImage());//champ id
 
+                        listItem_cd_theque.add(map_cd_theque);
+                    }
+                }else {
+                    map_cd_theque = new HashMap<>();
+                    map_cd_theque.put("id", "null");
+                    map_cd_theque.put("info", "Il n'y a aucun CD");//champ id
                     listItem_cd_theque.add(map_cd_theque);
                 }
-                for (int i = 0; i < list_cd_utilisateur.size(); i++) {
+
+
+                if (list_cd_utilisateur.size() > 0) {
+                    for (int i = 0; i < list_cd_utilisateur.size(); i++) {
+                        map_cd_user = new HashMap<>();
+                        map_cd_user.put("id", "" + list_cd_utilisateur.get(i).getId_cd());
+                        map_cd_user.put("info", list_cd_utilisateur.get(i).getNom_artist() + " - " + list_cd_utilisateur.get(i).getNom_album());//champ id
+                        map_cd_user.put("image", list_cd_utilisateur.get(i).getImage());//champ id
+                        listItem_cd_user.add(map_cd_user);
+                    }
+                }else {
                     map_cd_user = new HashMap<>();
-                    map_cd_user.put("id", "" + list_cd_utilisateur.get(i).getId_cd());
-                    map_cd_user.put("info", list_cd_utilisateur.get(i).getNom_artist() + " - " + list_cd_utilisateur.get(i).getNom_album());//champ id
-                    map_cd_user.put("image", list_cd_utilisateur.get(i).getImage());//champ id
+                    map_cd_user.put("id", "null");
+                    map_cd_user.put("info", "Il n'y a aucun CD");//champ id
                     listItem_cd_user.add(map_cd_user);
                 }
 
@@ -710,6 +726,55 @@ public class Activity_utilisateur extends AppCompatActivity {
 
                 }
             }
+        }
+
+    }
+
+    private class RendreCd extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (!Methodes.internet_diponible(activity)) {
+
+                Intent intent = new Intent(activity, Activity_lancement.class);
+                startActivity(intent);
+                finish();
+
+            } else {
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setTitle("Veuillez patienter");
+                mProgressDialog.setMessage("Connexion en cours...");
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.show();
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (Methodes.internet_diponible(activity)) {
+                if (table_emprunt.album_terminer_emprunt(qrcode, string_id_user)) {
+                    //TODO améliorer le visuel du dialog
+                    cd = table_cd_online.get_cd(qrcode);
+                    etat_changement = true;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mProgressDialog.hide();
+
+            if(etat_changement){
+                if (Methodes.internet_diponible(activity)) {
+                    info_dialog("Veuillez rendre le CD \n" + cd.getNom_album() + " - " + cd.getNom_artist());
+                }
+            }else{
+                retour();
+                info_dialog("Aucune correspondace trouvée");
+            }
+
         }
 
     }

@@ -187,6 +187,8 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
                             View view = super.getView(position, convertView, parent);
                             ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
                             Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
+                            TextView textView_sous_titre = (TextView) view.findViewById(R.id.textView_info_sous_titre);
+                            textView_sous_titre.setText("Par "+response.getData().get(0).getArtist().getName());
                             return view;
                         }
                     };
@@ -221,7 +223,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
 
             Bitmap bitmap = Methodes.generateQRBitmap(string_id_cd);
             imageView.setImageBitmap(bitmap);
-            mon_cd = table_cd_online.get_cd(string_id_cd);
+            mon_cd = table_cd_online.get_cd(string_qr_code);
             proprietaire =  table_user_online.get_user(mon_cd.getId_proprio());
             textView_nom_album.setText("Nom album : "+mon_cd.getNom_album());
             textView_nom_artist.setText("Nom artiste : "+mon_cd.getNom_artist());

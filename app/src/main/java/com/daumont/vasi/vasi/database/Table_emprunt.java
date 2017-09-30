@@ -233,7 +233,6 @@ public class Table_emprunt extends Back4App{
         try {
             ParseObject parseObject = query.getFirst();
             if(parseObject!=null){
-                //(int)parseObject.get("id_proprietaire") == Integer.parseInt(id_user)
                 if((int)parseObject.get("id_emprunteur") == Integer.parseInt(id_user)){
 
                     Emprunt emprunt = new Emprunt ((int) parseObject.get("id_emprunt"),

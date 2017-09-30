@@ -80,6 +80,9 @@ public class Activity_administrateur extends AppCompatActivity {
     private Activity activity;
     private String etat_notif;
     private User user;
+    private CD cd;
+    private boolean etat_changement;
+    private String qrcode;
 
     /**
      * Listener sur le bouton d'onglet
@@ -577,6 +580,7 @@ public class Activity_administrateur extends AppCompatActivity {
      */
     private void info_dialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(Activity_administrateur.this);
+        builder.setCancelable(false);
         builder.setMessage(message)
                 .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -594,25 +598,31 @@ public class Activity_administrateur extends AppCompatActivity {
      * @param data
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
         if (result != null) {
             if (result.getContents() == null) {
 
                 info_dialog("Aucun QRCode détecté");
+
+                retour();
             } else {
-                if (table_emprunt.album_terminer_emprunt(result.getContents(), string_id_user)) {
-                    //TODO améliorer le visuel du dialog
-                    info_dialog("Numéro album : " + result.getContents() + "\nCD rendu");
+                qrcode = result.getContents();
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
                 } else {
-                    info_dialog("Problème rencontré");
+                    new RendreCd().execute();
                 }
 
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+
     }
+
 
     private class Chargement extends AsyncTask<Void, Void, Void> {
         @Override
@@ -712,6 +722,55 @@ public class Activity_administrateur extends AppCompatActivity {
 
                 }
             }
+        }
+
+    }
+
+    private class RendreCd extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (!Methodes.internet_diponible(activity)) {
+
+                Intent intent = new Intent(activity, Activity_lancement.class);
+                startActivity(intent);
+                finish();
+
+            } else {
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setTitle("Veuillez patienter");
+                mProgressDialog.setMessage("Connexion en cours...");
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.show();
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (Methodes.internet_diponible(activity)) {
+                if (table_emprunt.album_terminer_emprunt(qrcode, string_id_user)) {
+                    //TODO améliorer le visuel du dialog
+                    cd = table_cd_online.get_cd(qrcode);
+                    etat_changement = true;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mProgressDialog.hide();
+
+            if(etat_changement){
+                if (Methodes.internet_diponible(activity)) {
+                    info_dialog("Veuillez rendre le CD \n" + cd.getNom_album() + " - " + cd.getNom_artist());
+                }
+            }else{
+                retour();
+                info_dialog("Aucune correspondace trouvée");
+            }
+
         }
 
     }

@@ -93,6 +93,29 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
                                 } else {
                                     table_user_online.add_user(new User(editText_nom.getText().toString(), editText_prenom.getText().toString(), type, editText_identifiant.getText().toString(), editText_password_1.getText().toString()));
                                     ajouter_utilisateur();
+
+                                    if (!Methodes.internet_diponible(activity)) {
+                                        Intent intent = new Intent(activity, Activity_lancement.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }else{
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_utilisateur.this);
+                                        builder.setCancelable(false);
+                                        builder.setMessage("Le nouveau compte a été créé")
+                                                .setPositiveButton("Retour", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        Intent intent = new Intent(Activity_ajouter_utilisateur.this, Activity_administrateur.class);
+                                                        Bundle objetbunble = new Bundle();
+                                                        objetbunble.putString("id_user", string_id_user);
+                                                        intent.putExtras(objetbunble);
+                                                        startActivity(intent);
+                                                        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+                                                        finish();
+                                                    }
+                                                });
+                                        builder.create();
+                                        builder.show();
+                                    }
                                 }
                             } else {
                                 Methodes.info_dialog("Mot de passe non identique",activity);
@@ -187,6 +210,8 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
         }
 
     }
+
+
 
 
 }

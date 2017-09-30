@@ -57,14 +57,16 @@
             android:name=".activity.Activity_details_cd"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.Activity_rendre_cd"
-            android:screenOrientation="portrait"/>
         <activity android:name=".activity.Activity_emprunter_cd"
             android:screenOrientation="portrait"/>
         <activity android:name=".activity.Activity_emprunter_album_details"
             android:screenOrientation="portrait"/>
         <activity android:name=".activity.Activity_modifier_profil"
             android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.ActivityQrCode"
+            android:screenOrientation="portrait"></activity>
+
+
     </application>
 
 </manifest>
