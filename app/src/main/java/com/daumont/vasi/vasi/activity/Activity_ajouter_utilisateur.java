@@ -13,6 +13,8 @@ import android.widget.RadioButton;
 
 import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
+import com.daumont.vasi.vasi.database.Table_cd_online;
+import com.daumont.vasi.vasi.database.Table_emprunt;
 import com.daumont.vasi.vasi.database.Table_user_online;
 import com.daumont.vasi.vasi.modele.User;
 
@@ -52,7 +54,7 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
         button_ajouter_utilisateur = (Button) findViewById(R.id.button_ajouter_utilisateur);
         radioButton_administrateur = (RadioButton) findViewById(R.id.radioButton_administrateur);
         radioButton_classique = (RadioButton) findViewById(R.id.radioButton_classique);
-        radioButton_administrateur.setChecked(true);
+        radioButton_classique.setChecked(true);
 
         //Recuperation parametres
         Bundle objetbunble = this.getIntent().getExtras();
@@ -60,8 +62,18 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
             string_id_user = objetbunble.getString("id_user");
         }
 
-        //connexion a la base de données
-        table_user_online = new Table_user_online(this);
+        if (!Methodes.internet_diponible(activity)) {
+
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+
+        } else {
+            //connexion a la base de données
+            table_user_online = new Table_user_online(this);
+
+        }
+
 
         //LISTENER
         button_ajouter_utilisateur.setOnClickListener(new View.OnClickListener() {
