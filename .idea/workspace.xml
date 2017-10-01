@@ -12,11 +12,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7ad1ebb6-d650-4113-a308-39663ad96b5f" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_administrateur.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_administrateur.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_utilisateur.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_utilisateur.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/database/Table_user_online.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/database/Table_user_online.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_modifier_profil.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_modifier_profil.xml" />
     </list>
     <ignored path="VASI.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -2808,7 +2803,14 @@
       <option name="project" value="LOCAL" />
       <updated>1506869943620</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Modification interface : - modification mot de passe, modifier profil&#10;ajout de la suppression utilisateur&#10;correction d'un bug id_cd au lieu de qr_code du cd&#10;&#10;">
+      <created>1506872368580</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1506872368580</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TodoView">
@@ -2902,7 +2904,8 @@
     <MESSAGE value="nombreux correctifs&#10;" />
     <MESSAGE value="rendre un CD ok;&#10;correction erreur id / qr code / cd&#10;" />
     <MESSAGE value="Modification interface ajout utilisateur&#10;applications de correctifs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Modification interface ajout utilisateur&#10;applications de correctifs" />
+    <MESSAGE value="Modification interface : - modification mot de passe, modifier profil&#10;ajout de la suppression utilisateur&#10;correction d'un bug id_cd au lieu de qr_code du cd&#10;&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Modification interface : - modification mot de passe, modifier profil&#10;ajout de la suppression utilisateur&#10;correction d'un bug id_cd au lieu de qr_code du cd&#10;&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
