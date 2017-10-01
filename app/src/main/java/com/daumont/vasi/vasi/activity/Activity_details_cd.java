@@ -99,6 +99,7 @@ public class Activity_details_cd extends AppCompatActivity {
     private boolean etat_media_fab;
     private int position_old;
     private String first_title;
+    private int qr_code;
 
     /**
      * Permet de naviguer entre les différents onglets grâce au menu du bas
@@ -194,6 +195,8 @@ public class Activity_details_cd extends AppCompatActivity {
         Bundle objetbunble = this.getIntent().getExtras();
         if (objetbunble != null) {
             id_cd = objetbunble.getString("id_cd");
+
+            qr_code = Integer.parseInt(objetbunble.getString("qr_code"));
             string_id_user = objetbunble.getString("id_user");
         }
         if (!Methodes.internet_diponible(activity)) {
@@ -223,6 +226,7 @@ public class Activity_details_cd extends AppCompatActivity {
                         map_titres = new HashMap<>();
                         map_titres.put("id", "" + response.getData().get(i).getId());
                         map_titres.put("info", ""+response.getData().get(i).getTitle());
+
                         listItem_titres.add(map_titres);
                         list_preview.add(response.getData().get(i).getPreview());
                     }
@@ -313,7 +317,7 @@ public class Activity_details_cd extends AppCompatActivity {
 
         Bitmap bitmap = Methodes.generateQRBitmap(id_cd);
         imageView.setImageBitmap(bitmap);
-        mon_cd = table_cd_online.get_cd(id_cd);
+        mon_cd = table_cd_online.get_cd(qr_code);
         proprietaire = table_user_online.get_user(mon_cd.getId_proprio());
         textView_nom_album.setText("Nom album : " + mon_cd.getNom_album());
         textView_nom_artist.setText("Nom artiste : " + mon_cd.getNom_artist());

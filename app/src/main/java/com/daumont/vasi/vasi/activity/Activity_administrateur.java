@@ -223,6 +223,7 @@ public class Activity_administrateur extends AppCompatActivity {
                             Intent i = new Intent(Activity_administrateur.this, Activity_details_cd.class);
                             Bundle objetbunble = new Bundle();
                             objetbunble.putString("id_cd", map.get("id"));
+                            objetbunble.putString("qr_code", map.get("qr_code"));
                             objetbunble.putString("id_user", "" + string_id_user);
                             i.putExtras(objetbunble);
                             Activity_administrateur.this.startActivity(i);
@@ -666,7 +667,7 @@ public class Activity_administrateur extends AppCompatActivity {
                 for (int i = 0; i < list_user.size(); i++) {
                     map_user = new HashMap<>();
                     map_user.put("id", "" + list_user.get(i).getId_user());
-                    map_user.put("info", list_user.get(i).getNom() + "\n" + list_user.get(i).getPrenom());//champ id
+                    map_user.put("info", list_user.get(i).getIdentifiant()+"\n"+list_user.get(i).getNom() +" "+ list_user.get(i).getPrenom());//champ id
                     listItem_user.add(map_user);
                 }
 
@@ -676,6 +677,7 @@ public class Activity_administrateur extends AppCompatActivity {
                         map_cd.put("id", "" + list_cd.get(i).getId_cd());
                         map_cd.put("info", list_cd.get(i).getNom_artist() + "\n" + list_cd.get(i).getNom_album());//champ id
                         map_cd.put("image", list_cd.get(i).getImage());//champ id
+                        map_cd.put("qr_code", "" + list_cd.get(i).getQr_code());
                         listItem_cd.add(map_cd);
                     }
                 } else {
@@ -691,6 +693,7 @@ public class Activity_administrateur extends AppCompatActivity {
                         map_cd_user.put("id", "" + list_cd_utilisateur.get(i).getId_cd());
                         map_cd_user.put("info", list_cd_utilisateur.get(i).getNom_artist() + "\n" + list_cd_utilisateur.get(i).getNom_album());//champ id
                         map_cd_user.put("image", list_cd_utilisateur.get(i).getImage());//champ id
+                        map_cd_user.put("qr_code", "" + list_cd_utilisateur.get(i).getQr_code());
                         listItem_cd_user.add(map_cd_user);
                     }
                 } else {

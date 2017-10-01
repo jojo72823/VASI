@@ -2,6 +2,8 @@ package com.daumont.vasi.vasi.activity;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
@@ -103,6 +107,18 @@ public class Activity_details_utilisateur extends AppCompatActivity {
 
     };
 
+    /**
+     * Créer le menu en haut à droite
+     *
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_suppression, menu);
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,6 +137,7 @@ public class Activity_details_utilisateur extends AppCompatActivity {
         fab = (FloatingActionButton) findViewById(R.id.fab);
         textView_nom = (TextView) findViewById(R.id.textView_nom);
         textView_prenom = (TextView) findViewById(R.id.textView_prenom);
+        toolbar.inflateMenu(R.menu.menu_suppression);
 
         //Récupération des paramètres
         Bundle objetbunble = this.getIntent().getExtras();
@@ -170,6 +187,51 @@ public class Activity_details_utilisateur extends AppCompatActivity {
             load_info_utilisateur();
         }
 
+        toolbar.setOnMenuItemClickListener(new android.support.v7.widget.Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_suppression:
+                        if (!Methodes.internet_diponible(activity)) {
+                            Intent intent = new Intent(activity, Activity_lancement.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            /**ON DEMANDE CONFIRMATION*****************************************/
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setCancelable(false);
+                            builder.setMessage("Etes-vous sûr de vouloir supprimer l'utilisateur")
+                                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            if(string_id_user.equals(string_id_user_select)){
+                                                Toast.makeText(activity, "Vous ne pouvez supprimer votre compte utilisateur", Toast.LENGTH_LONG).show();
+                                            }else{
+                                                Toast.makeText(activity, "Suppression de l'utilisateur", Toast.LENGTH_SHORT).show();
+                                                table_user_online.delete_user(Integer.parseInt(string_id_user_select));
+                                                retour();
+                                            }
+
+
+                                        }
+                                    })
+                                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+
+                                        }
+                                    });
+                            builder.create();
+                            builder.show();
+                        }
+
+                        return true;
+
+
+                    default:
+                        return false;
+                }
+            }
+        });
+
 
 
 
@@ -181,15 +243,9 @@ public class Activity_details_utilisateur extends AppCompatActivity {
                     Intent intent = new Intent(activity, Activity_lancement.class);
                     startActivity(intent);
                     finish();
-                }else{
-                    if (add_cd == false) {
+                }else {
+                    Toast.makeText(Activity_details_utilisateur.this, "Actuellement non disponible", Toast.LENGTH_SHORT).show();
 
-                        Snackbar.make(view, "Actuellement non disponible", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    } else {
-                        Snackbar.make(view, "Actuellement non disponible", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
                 }
 
             }
@@ -274,9 +330,20 @@ public class Activity_details_utilisateur extends AppCompatActivity {
             startActivity(intent);
             finish();
         }else{
+            Intent intent = null;
+            User user = table_user_online.get_user(Integer.parseInt(string_id_user));
+            if (user.getType().equals("admin")) {
+                intent = new Intent(activity, Activity_administrateur.class);
+            } else {
+                intent = new Intent(activity, Activity_utilisateur.class);
+            }
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_user", string_id_user);
+            intent.putExtras(objetbunble);
+            startActivity(intent);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
             finish();
         }
-
     }
 
 }
