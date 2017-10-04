@@ -195,7 +195,6 @@ public class Activity_details_cd extends AppCompatActivity {
         Bundle objetbunble = this.getIntent().getExtras();
         if (objetbunble != null) {
             id_cd = objetbunble.getString("id_cd");
-
             qr_code = Integer.parseInt(objetbunble.getString("qr_code"));
             string_id_user = objetbunble.getString("id_user");
         }
@@ -227,9 +226,11 @@ public class Activity_details_cd extends AppCompatActivity {
                         map_titres.put("id", "" + response.getData().get(i).getId());
                         map_titres.put("info", ""+response.getData().get(i).getTitle());
 
+
                         listItem_titres.add(map_titres);
                         list_preview.add(response.getData().get(i).getPreview());
                     }
+
                     first_title=response.getData().get(0).getTitle();
                     SimpleAdapter mSchedule = new SimpleAdapter(context,
                             listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
@@ -242,6 +243,7 @@ public class Activity_details_cd extends AppCompatActivity {
                             ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
                             TextView textView_sous_titre = (TextView) view.findViewById(R.id.textView_info_sous_titre);
                             textView_sous_titre.setText("Par "+response.getData().get(0).getArtist().getName());
+
                             Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
 
                             ImageView imageView_anim = (ImageView) view.findViewById(R.id.imageView_anim);
@@ -315,7 +317,7 @@ public class Activity_details_cd extends AppCompatActivity {
 
 
 
-        Bitmap bitmap = Methodes.generateQRBitmap(id_cd);
+        Bitmap bitmap = Methodes.generateQRBitmap(""+qr_code);
         imageView.setImageBitmap(bitmap);
         mon_cd = table_cd_online.get_cd(qr_code);
         proprietaire = table_user_online.get_user(mon_cd.getId_proprio());
@@ -328,6 +330,7 @@ public class Activity_details_cd extends AppCompatActivity {
         toolbar_layout.setTitle(mon_cd.getNom_artist() + " - " + mon_cd.getNom_album());
         ImageView imageView_cd = (ImageView) app_bar.findViewById(R.id.imageView_cd);
         Picasso.with(imageView_cd.getContext()).load(mon_cd.getImage()).centerCrop().fit().into(imageView_cd);
+        url_image = mon_cd.getImage();
         imageView_cd.setColorFilter(Color.parseColor("#7F000000"));
 
         toolbar.setOnMenuItemClickListener(new android.support.v7.widget.Toolbar.OnMenuItemClickListener() {

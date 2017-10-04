@@ -4,6 +4,6 @@
     <item
         android:id="@+id/action_suppression"
         android:orderInCategory="100"
-        android:title="Supprimer"
+        android:title="Supprimer de la CDthèque"
         app:showAsAction="never" />
 </menu>
