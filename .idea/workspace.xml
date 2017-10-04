@@ -11,12 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7ad1ebb6-d650-4113-a308-39663ad96b5f" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/ActivityQrCode.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_details_cd.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_utilisateur.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_utilisateur.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/menu/menu_suppression.xml" afterPath="$PROJECT_DIR$/app/src/main/res/menu/menu_suppression.xml" />
     </list>
     <ignored path="VASI.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -98,8 +93,8 @@
       <file leaf-file-name="Activity_emprunter_cd.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_cd.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="524">
-              <caret line="222" column="43" selection-start-line="222" selection-start-column="43" selection-end-line="222" selection-end-column="43" />
+            <state relative-caret-position="252">
+              <caret line="156" column="66" selection-start-line="156" selection-start-column="66" selection-end-line="156" selection-end-column="66" />
               <folding />
             </state>
           </provider>
@@ -2795,7 +2790,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1932" height="1056" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32729805" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.05233853" sideWeight="0.49573562" order="7" side_tool="false" content_ui="tabs" />
@@ -3345,8 +3340,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/daumont/vasi/vasi/activity/Activity_emprunter_cd.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="524">
-          <caret line="222" column="43" selection-start-line="222" selection-start-column="43" selection-end-line="222" selection-end-column="43" />
+        <state relative-caret-position="252">
+          <caret line="156" column="66" selection-start-line="156" selection-start-column="66" selection-end-line="156" selection-end-column="66" />
           <folding />
         </state>
       </provider>
