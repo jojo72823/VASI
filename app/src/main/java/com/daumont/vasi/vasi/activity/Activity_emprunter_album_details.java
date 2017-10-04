@@ -233,12 +233,18 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
 
 
             //RECHERCHER SI ALBUM DEJA EMPRUNTER
-            if(table_emprunt.album_emprunter(string_qr_code)){
+            /*if(table_emprunt.album_emprunter(string_qr_code)){
                 info_dialog("Album actuellement emprunté");
                 String identifiant = table_emprunt.album_emprunter_identifiant(string_qr_code);
                 textView_etat_emprunt.setText("Emprunté par "+identifiant);
             }else{
                 textView_etat_emprunt.setText("Pas emprunté");
+            }*/
+            String etat_emprunt =  table_emprunt.get_etat_emprunt_cd(Integer.parseInt(string_qr_code));
+            if(etat_emprunt.equals("preter")){
+                textView_etat_emprunt.setText("Actuellement indisponible");
+            }else{
+                textView_etat_emprunt.setText("Actuellement disponible");
             }
 
             //RECHERCHER EMPRUNT

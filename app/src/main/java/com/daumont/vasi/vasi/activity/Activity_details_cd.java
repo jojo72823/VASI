@@ -38,6 +38,7 @@ import com.bumptech.glide.Glide;
 import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
+import com.daumont.vasi.vasi.database.Table_emprunt;
 import com.daumont.vasi.vasi.database.Table_user_online;
 import com.daumont.vasi.vasi.deezer.GsonRequest;
 import com.daumont.vasi.vasi.deezer.List_Album;
@@ -226,7 +227,6 @@ public class Activity_details_cd extends AppCompatActivity {
                         map_titres = new HashMap<>();
                         map_titres.put("id", "" + response.getData().get(i).getId());
                         map_titres.put("info", ""+response.getData().get(i).getTitle());
-
                         listItem_titres.add(map_titres);
                         list_preview.add(response.getData().get(i).getPreview());
                     }
@@ -242,7 +242,9 @@ public class Activity_details_cd extends AppCompatActivity {
                             ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
                             TextView textView_sous_titre = (TextView) view.findViewById(R.id.textView_info_sous_titre);
                             textView_sous_titre.setText("Par "+response.getData().get(0).getArtist().getName());
-                            Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
+                            Picasso.with(image_view_cd.getContext()).load(mon_cd.getImage()).centerCrop().fit().into(image_view_cd);
+
+
 
                             ImageView imageView_anim = (ImageView) view.findViewById(R.id.imageView_anim);
                             Glide.with(activity).load(R.drawable.anim).into(imageView_anim);
@@ -322,7 +324,16 @@ public class Activity_details_cd extends AppCompatActivity {
         textView_nom_album.setText("Nom album : " + mon_cd.getNom_album());
         textView_nom_artist.setText("Nom artiste : " + mon_cd.getNom_artist());
         textView_proprietaire.setText("Propriétaire : " + proprietaire.getIdentifiant());
-        textView_etat_emprunt.setText("Aucun renseignement sur l'emprunt");
+        Table_emprunt table_emprunt = new Table_emprunt(this);
+        String etat_emprunt =  table_emprunt.get_etat_emprunt_cd(qr_code);
+        if(etat_emprunt.equals("preter")){
+            textView_etat_emprunt.setText("Actuellement indisponible");
+        }else{
+                textView_etat_emprunt.setText("Actuellement disponible");
+        }
+
+
+
 
         //TODO RECHERCHER EMPRUNT
         toolbar_layout.setTitle(mon_cd.getNom_artist() + " - " + mon_cd.getNom_album());

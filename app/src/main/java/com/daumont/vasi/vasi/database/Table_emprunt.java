@@ -37,6 +37,9 @@ public class Table_emprunt extends Back4App{
      ************************************************************************************/
     public long add_emprunt(Emprunt emprunt) {
         ParseObject parse_code = new ParseObject("table_emprunt");
+
+        //object_id = parse_code.getObjectId()();
+
         parse_code.put("id_emprunt",generate_id_emprunt());
         parse_code.put("id_proprietaire",emprunt.getId_proprietaire());
         parse_code.put("id_emprunteur",emprunt.getId_emprunteur());
@@ -182,6 +185,29 @@ public class Table_emprunt extends Back4App{
 
 
         return emprunt;
+    }
+
+    public String get_etat_emprunt_cd(int qr_code) {
+
+        String etat_emprunt=null;
+
+        ParseQuery query = ParseQuery.getQuery("table_emprunt");
+        query.whereEqualTo("qr_code", qr_code);
+
+        ParseObject parseObject = null;
+        Emprunt emprunt=null;
+        try {
+            parseObject = query.getFirst();
+            etat_emprunt =  parseObject.get("etat_emprunt").toString();
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Log.d("ONLINE", "Problème pour get_user() : " + e);
+            etat_emprunt =  "rien";
+        }
+
+
+        return etat_emprunt;
     }
 
     //Test si l'album est déjà emprunté
