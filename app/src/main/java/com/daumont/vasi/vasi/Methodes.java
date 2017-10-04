@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.daumont.vasi.vasi.activity.ActivityLogin;
+import com.daumont.vasi.vasi.activity.Activity_administrateur;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -82,6 +85,7 @@ public class Methodes {
         builder.create();
         builder.show();
     }
+
 }
 
 

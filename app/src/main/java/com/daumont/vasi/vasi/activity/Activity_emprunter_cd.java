@@ -2,6 +2,7 @@ package com.daumont.vasi.vasi.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
@@ -70,6 +71,8 @@ public class Activity_emprunter_cd extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        activity = this;
+
         //Recuperation des elements visuels
         setContentView(R.layout.activity_emprunter_cd);
         listView = (ListView) findViewById(R.id.listView);
@@ -82,94 +85,108 @@ public class Activity_emprunter_cd extends AppCompatActivity {
         if (objetbunble != null) {
             string_id_user = objetbunble.getString("id_user");
         }
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            //Initialisation bdd
+            table_user_online = new Table_user_online(this);
+            table_cd_online = new Table_cd_online(this);
+            table_emprunt = new Table_emprunt(this);
 
-        //Initialisation bdd
-        table_user_online = new Table_user_online(this);
-        table_cd_online = new Table_cd_online(this);
-        table_emprunt = new Table_emprunt(this);
+            //Initialisation variables
+            User user = table_user_online.get_user(Integer.parseInt(string_id_user));
+            list_cd = table_cd_online.list_cd();
 
-        //Initialisation variables
-        User user = table_user_online.get_user(Integer.parseInt(string_id_user));
-        list_cd = table_cd_online.list_cd();
-        activity = this;
 
-        //Génération de la listView
+            //Génération de la listView
 
-        for (int i = 0; i < list_cd.size(); i++) {
-            if (list_cd.get(i).getId_proprio() != Integer.parseInt(string_id_user)) {
+            for (int i = 0; i < list_cd.size(); i++) {
+                if (list_cd.get(i).getId_proprio() != Integer.parseInt(string_id_user)) {
+                    map_cd = new HashMap<>();
+                    map_cd.put("id", "" + list_cd.get(i).getId_cd());
+                    map_cd.put("qr_code", "" + list_cd.get(i).getQr_code());
+                    map_cd.put("info", list_cd.get(i).getNom_artist() + "\n" + list_cd.get(i).getNom_album());//champ id
+                    map_cd.put("image", list_cd.get(i).getImage());//champ id
+
+                    listItem_cd.add(map_cd);
+                }
+            }
+            if (listItem_cd.size() == 0 || list_cd.size() == 0) {
                 map_cd = new HashMap<>();
-                map_cd.put("id", "" + list_cd.get(i).getId_cd());
-                map_cd.put("qr_code", "" + list_cd.get(i).getQr_code());
-                map_cd.put("info", list_cd.get(i).getNom_artist() + "\n" + list_cd.get(i).getNom_album());//champ id
-                map_cd.put("image", list_cd.get(i).getImage());//champ id
-
+                map_cd.put("info", "Aucun album disponible");
+                map_cd.put("id", "" + (-1));
+                map_cd.put("image", "vide");//champ id
                 listItem_cd.add(map_cd);
             }
-        }
-        if (listItem_cd.size() == 0 || list_cd.size() == 0) {
-            map_cd = new HashMap<>();
-            map_cd.put("info", "Aucun album disponible");
-            map_cd.put("id", "" + (-1));
-            map_cd.put("image", "vide");//champ id
-            listItem_cd.add(map_cd);
-        }
 
 
-        SimpleAdapter mSchedule = new SimpleAdapter(this.getBaseContext(),
-                listItem_cd, R.layout.layout_cd, new String[]{"info"}, new int[]{R.id.textView_info_cd}) {
-            public View getView(int position, View convertView, ViewGroup parent) {
+            SimpleAdapter mSchedule = new SimpleAdapter(this.getBaseContext(),
+                    listItem_cd, R.layout.layout_cd, new String[]{"info"}, new int[]{R.id.textView_info_cd}) {
+                public View getView(int position, View convertView, ViewGroup parent) {
 
-                HashMap<String, String> map = (HashMap<String, String>) listView
-                        .getItemAtPosition(position);
-                final String url_image = map.get("image");
-                View view = super.getView(position, convertView, parent);
-                ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_cd);
-                if (!url_image.equals("vide")) {
-                    Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
-                } else {
-                    image_view_cd.setVisibility(View.GONE);
+                    HashMap<String, String> map = (HashMap<String, String>) listView
+                            .getItemAtPosition(position);
+                    final String url_image = map.get("image");
+                    View view = super.getView(position, convertView, parent);
+                    ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_cd);
+                    if (!url_image.equals("vide")) {
+                        Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
+                    } else {
+                        image_view_cd.setVisibility(View.GONE);
+                    }
+
+                    return view;
+                }
+            };
+            listView.setAdapter(mSchedule);
+
+            //Listener sur la listView
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> a, View v, int position,
+                                        long id) {
+                    HashMap<String, String> map = (HashMap<String, String>) listView
+                            .getItemAtPosition(position);
+                    if (!map.get("id").equals("-1")) {
+                        Intent i = new Intent(Activity_emprunter_cd.this, Activity_emprunter_album_details.class);
+                        Bundle objetbunble = new Bundle();
+                        objetbunble.putString("id_cd", map.get("id"));
+                        objetbunble.putString("id_user", "" + string_id_user);
+                        objetbunble.putString("qr_code", "" + map.get("qr_code"));
+                        i.putExtras(objetbunble);
+                        Activity_emprunter_cd.this.startActivity(i);
+                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        finish();
+                    }
+
                 }
 
-                return view;
-            }
-        };
-        listView.setAdapter(mSchedule);
+            });
+        }
 
-        //Listener sur la listView
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            public void onItemClick(AdapterView<?> a, View v, int position,
-                                    long id) {
-                HashMap<String, String> map = (HashMap<String, String>) listView
-                        .getItemAtPosition(position);
-                if (!map.get("id").equals("-1")) {
-                    Intent i = new Intent(Activity_emprunter_cd.this, Activity_emprunter_album_details.class);
-                    Bundle objetbunble = new Bundle();
-                    objetbunble.putString("id_cd", map.get("id"));
-                    objetbunble.putString("id_user", "" + string_id_user);
-                    objetbunble.putString("qr_code", "" + map.get("qr_code"));
-                    i.putExtras(objetbunble);
-                    Activity_emprunter_cd.this.startActivity(i);
-                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                    finish();
-                }
-
-            }
-
-        });
 
 
         //LISTENER
         button_scanner_album.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IntentIntegrator integrator = new IntentIntegrator(activity);
-                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                integrator.setPrompt("Veuillez scanner l'album.");
-                integrator.setCameraId(0);
-                integrator.setBeepEnabled(false);
-                integrator.setBarcodeImageEnabled(false);
-                integrator.initiateScan();
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    IntentIntegrator integrator = new IntentIntegrator(activity);
+                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                    integrator.setPrompt("Veuillez scanner l'album.");
+                    integrator.setCameraId(0);
+                    integrator.setBeepEnabled(false);
+                    integrator.setBarcodeImageEnabled(false);
+                    integrator.initiateScan();
+                }
+
 
             }
         });
@@ -189,17 +206,24 @@ public class Activity_emprunter_cd extends AppCompatActivity {
             if (result.getContents() == null) {
                 Toast.makeText(this, "Aucun QRCode trouvé", Toast.LENGTH_LONG).show();
             } else {
-                qr_code_album =  result.getContents();
-                Toast.makeText(this, "Numéro album : " + result.getContents(), Toast.LENGTH_LONG).show();
-                cd_emprunt = table_cd_online.get_cd(Integer.parseInt(qr_code_album));
-                if(Integer.parseInt(string_id_user) == (cd_emprunt.getId_proprio())){
-                    info_dialog("Ce cd vous appartient. Vous ne pouvez l'emprunter");
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
                 }else{
-                    if(table_emprunt.album_emprunter(qr_code_album)){
-                        info_dialog("Ce CD est déjà emprunté");
-                    }else{
-                        confirmation();
+                    qr_code_album = result.getContents();
+                    Toast.makeText(this, "Numéro album : " + result.getContents(), Toast.LENGTH_LONG).show();
+                    cd_emprunt = table_cd_online.get_cd(Integer.parseInt(qr_code_album));
+                    if (Integer.parseInt(string_id_user) == (cd_emprunt.getId_proprio())) {
+                        info_dialog("Ce cd vous appartient. Vous ne pouvez l'emprunter");
+                    } else {
+                        if (table_emprunt.album_emprunter(qr_code_album)) {
+                            info_dialog("Ce CD est déjà emprunté");
+                        } else {
+                            confirmation();
+                        }
                     }
+
                 }
 
 
@@ -210,19 +234,26 @@ public class Activity_emprunter_cd extends AppCompatActivity {
     }
 
     public void retour() {
-        Intent intent = null;
-        User user = table_user_online.get_user(Integer.parseInt(string_id_user));
-        if(user.getType().equals("admin")){
-            intent = new Intent(Activity_emprunter_cd.this, Activity_administrateur.class);
-        }else{
-            intent = new Intent(Activity_emprunter_cd.this, Activity_utilisateur.class);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        } else {
+            Intent intent = null;
+            User user = table_user_online.get_user(Integer.parseInt(string_id_user));
+            if (user.getType().equals("admin")) {
+                intent = new Intent(Activity_emprunter_cd.this, Activity_administrateur.class);
+            } else {
+                intent = new Intent(Activity_emprunter_cd.this, Activity_utilisateur.class);
+            }
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_user", "" + string_id_user);
+            intent.putExtras(objetbunble);
+            startActivity(intent);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            finish();
         }
-        Bundle objetbunble = new Bundle();
-        objetbunble.putString("id_user", "" + string_id_user);
-        intent.putExtras(objetbunble);
-        startActivity(intent);
-        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-        finish();
+
     }
 
     private void info_dialog(String message) {
@@ -238,25 +269,31 @@ public class Activity_emprunter_cd extends AppCompatActivity {
     }
 
 
-
     public void confirmation() {
-        /**ON DEMANDE CONFIRMATION*****************************************/
-        CD cd = table_cd_online.get_cd(cd_emprunt.getQr_code());
-        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_emprunter_cd.this);
-        builder.setMessage("Voulez-vous envoyer une demande d'emprunt pour l'album "+ cd.getNom_album()+"-"+cd.getNom_artist()+"?")
-                .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        table_emprunt.add_emprunt(new Emprunt(cd_emprunt.getId_proprio(),Integer.parseInt(string_id_user),cd_emprunt.getQr_code(),"demande"));
-                        info_dialog("Demande d'emprunt envoyée");
-                    }
-                })
-                .setNegativeButton("Non", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            /**ON DEMANDE CONFIRMATION*****************************************/
+            CD cd = table_cd_online.get_cd(cd_emprunt.getQr_code());
+            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_emprunter_cd.this);
+            builder.setMessage("Voulez-vous envoyer une demande d'emprunt pour l'album " + cd.getNom_album() + "-" + cd.getNom_artist() + "?")
+                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            table_emprunt.add_emprunt(new Emprunt(cd_emprunt.getId_proprio(), Integer.parseInt(string_id_user), cd_emprunt.getQr_code(), "demande"));
+                            info_dialog("Demande d'emprunt envoyée");
+                        }
+                    })
+                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
-                    }
-                });
-        builder.create();
-        builder.show();
+                        }
+                    });
+            builder.create();
+            builder.show();
+        }
+
     }
 
     /**

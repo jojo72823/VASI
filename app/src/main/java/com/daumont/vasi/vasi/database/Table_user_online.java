@@ -213,5 +213,23 @@ public class Table_user_online extends Back4App{
         return list_user;
     }
 
+    public boolean delete_user(int id_user) {
+        ParseQuery query = ParseQuery.getQuery("table_user");
+        query.whereEqualTo("id_user", id_user);
+        boolean etat = false;
+        try {
+            ParseObject parseObject = query.getFirst();
+            if (parseObject == null) {
+                etat = false;
+            } else {
+                parseObject.delete();
+                etat = true;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return etat;
+    }
+
 
 }

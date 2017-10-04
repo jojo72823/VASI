@@ -1,6 +1,9 @@
 package com.daumont.vasi.vasi.activity;
 
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +22,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
 import com.daumont.vasi.vasi.database.Table_emprunt;
@@ -68,6 +74,7 @@ public class Activity_details_utilisateur extends AppCompatActivity {
     private int id_user;
     private String string_id_user, string_id_user_select;
     private boolean add_cd = false;
+    private Activity activity;
 
     /**
      * Listener sur le menu onglet
@@ -100,10 +107,23 @@ public class Activity_details_utilisateur extends AppCompatActivity {
 
     };
 
+    /**
+     * Créer le menu en haut à droite
+     *
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_suppression, menu);
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        activity = this;
         //Recuperation des elements visuels
         setContentView(R.layout.activity_details_utilisateur);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -117,6 +137,7 @@ public class Activity_details_utilisateur extends AppCompatActivity {
         fab = (FloatingActionButton) findViewById(R.id.fab);
         textView_nom = (TextView) findViewById(R.id.textView_nom);
         textView_prenom = (TextView) findViewById(R.id.textView_prenom);
+        toolbar.inflateMenu(R.menu.menu_suppression);
 
         //Récupération des paramètres
         Bundle objetbunble = this.getIntent().getExtras();
@@ -125,54 +146,108 @@ public class Activity_details_utilisateur extends AppCompatActivity {
             string_id_user = objetbunble.getString("id_user");
         }
 
-        //Initilisation bdd
-        table_user_online = new Table_user_online(this);
-        table_cd_online = new Table_cd_online(this);
-        table_emprunt = new Table_emprunt(this);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            //Initilisation bdd
+            table_user_online = new Table_user_online(this);
+            table_cd_online = new Table_cd_online(this);
+            table_emprunt = new Table_emprunt(this);
+            //Initialisation variables
+            listView_details.setNestedScrollingEnabled(true);
+            linearLayout_info.setNestedScrollingEnabled(true);
+            list_ses_cd = new ArrayList<>();
+            list_cd_emprunter = new ArrayList<>();
+            User user = table_user_online.get_user(Integer.parseInt(string_id_user_select));
+            toolbar_layout.setTitle("Profil de " + user.getIdentifiant());
+            list_ses_cd = table_cd_online.list_cd_utilistaeur(Integer.parseInt(string_id_user_select));
+            textView_nom.setText("Nom : " + user.getNom());
+            textView_prenom.setText("Prénom : " + user.getPrenom());
+            list_cd_emprunter = table_emprunt.list_cd_emprunter(Integer.parseInt(string_id_user));
 
-        //Initialisation variables
-        listView_details.setNestedScrollingEnabled(true);
-        linearLayout_info.setNestedScrollingEnabled(true);
-        list_ses_cd = new ArrayList<>();
-        list_cd_emprunter = new ArrayList<>();
-        User user = table_user_online.get_user(Integer.parseInt(string_id_user_select));
-        toolbar_layout.setTitle("Profil de " + user.getIdentifiant());
-        list_ses_cd = table_cd_online.list_cd_utilistaeur(Integer.parseInt(string_id_user_select));
-        textView_nom.setText("Nom : " + user.getNom());
-        textView_prenom.setText("Prénom : " + user.getPrenom());
-        list_cd_emprunter = table_emprunt.list_cd_emprunter(Integer.parseInt(string_id_user));
+            for (int i = 0; i < list_ses_cd.size(); i++) {
+                map_ses_cd = new HashMap<>();
+                map_ses_cd.put("id_cd", "" + list_ses_cd.get(i).getId_cd());
+                map_ses_cd.put("info", list_ses_cd.get(i).getNom_album() + " " + list_ses_cd.get(i).getNom_artist());//champ id
+                map_ses_cd.put("image", "" + list_ses_cd.get(i).getImage());
 
-        for (int i = 0; i < list_ses_cd.size(); i++) {
-            map_ses_cd = new HashMap<>();
-            map_ses_cd.put("id_cd", "" + list_ses_cd.get(i).getId_cd());
-            map_ses_cd.put("info", list_ses_cd.get(i).getNom_album() + " " + list_ses_cd.get(i).getNom_artist());//champ id
-            map_ses_cd.put("image", "" + list_ses_cd.get(i).getImage());
+                listItem_ses_cd.add(map_ses_cd);
+            }
 
-            listItem_ses_cd.add(map_ses_cd);
+            for (int i = 0; i < list_cd_emprunter.size(); i++) {
+                map_cd_emprunter = new HashMap<>();
+                map_cd_emprunter.put("id_cd", "" + list_cd_emprunter.get(i).getId_cd());
+                map_cd_emprunter.put("info", list_cd_emprunter.get(i).getNom_album() + " " + list_cd_emprunter.get(i).getNom_artist());//champ id
+                map_cd_emprunter.put("image", "" + list_cd_emprunter.get(i).getImage());
+                listItem_cd_emprunter.add(map_cd_emprunter);
+            }
+
+            load_info_utilisateur();
         }
 
-        for (int i = 0; i < list_cd_emprunter.size(); i++) {
-            map_cd_emprunter = new HashMap<>();
-            map_cd_emprunter.put("id_cd", "" + list_cd_emprunter.get(i).getId_cd());
-            map_cd_emprunter.put("info", list_cd_emprunter.get(i).getNom_album() + " " + list_cd_emprunter.get(i).getNom_artist());//champ id
-            map_cd_emprunter.put("image", "" + list_cd_emprunter.get(i).getImage());
-            listItem_cd_emprunter.add(map_cd_emprunter);
-        }
+        toolbar.setOnMenuItemClickListener(new android.support.v7.widget.Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_suppression:
+                        if (!Methodes.internet_diponible(activity)) {
+                            Intent intent = new Intent(activity, Activity_lancement.class);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            /**ON DEMANDE CONFIRMATION*****************************************/
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setCancelable(false);
+                            builder.setMessage("Etes-vous sûr de vouloir supprimer l'utilisateur")
+                                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            if(string_id_user.equals(string_id_user_select)){
+                                                Toast.makeText(activity, "Vous ne pouvez supprimer votre compte utilisateur", Toast.LENGTH_LONG).show();
+                                            }else{
+                                                Toast.makeText(activity, "Suppression de l'utilisateur", Toast.LENGTH_SHORT).show();
+                                                table_user_online.delete_user(Integer.parseInt(string_id_user_select));
+                                                retour();
+                                            }
 
-        load_info_utilisateur();
+
+                                        }
+                                    })
+                                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+
+                                        }
+                                    });
+                            builder.create();
+                            builder.show();
+                        }
+
+                        return true;
+
+
+                    default:
+                        return false;
+                }
+            }
+        });
+
+
+
 
         //LISTENERS
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (add_cd == false) {
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+                }else {
+                    Toast.makeText(Activity_details_utilisateur.this, "Actuellement non disponible", Toast.LENGTH_SHORT).show();
 
-                    Snackbar.make(view, "Actuellement non disponible", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                } else {
-                    Snackbar.make(view, "Actuellement non disponible", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
                 }
+
             }
         });
 
@@ -220,6 +295,7 @@ public class Activity_details_utilisateur extends AppCompatActivity {
      * Initialisation avec les cd empruntés
      */
     public void load_cd_emprunter() {
+
         fab.setImageResource(R.drawable.icon_disk_add);
         linearLayout_info.setVisibility(View.GONE);
         listView_details.setVisibility(View.VISIBLE);
@@ -249,7 +325,25 @@ public class Activity_details_utilisateur extends AppCompatActivity {
     }
 
     public void retour() {
-        finish();
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            Intent intent = null;
+            User user = table_user_online.get_user(Integer.parseInt(string_id_user));
+            if (user.getType().equals("admin")) {
+                intent = new Intent(activity, Activity_administrateur.class);
+            } else {
+                intent = new Intent(activity, Activity_utilisateur.class);
+            }
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_user", string_id_user);
+            intent.putExtras(objetbunble);
+            startActivity(intent);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            finish();
+        }
     }
 
 }

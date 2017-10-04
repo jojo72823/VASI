@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
 import com.daumont.vasi.vasi.database.Table_emprunt;
@@ -79,6 +80,9 @@ public class Activity_administrateur extends AppCompatActivity {
     private Activity activity;
     private String etat_notif;
     private User user;
+    private CD cd;
+    private boolean etat_changement;
+    private String qrcode;
 
     /**
      * Listener sur le bouton d'onglet
@@ -116,6 +120,7 @@ public class Activity_administrateur extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
 
         //Recuperation des elements visuels
         setContentView(R.layout.activity_administrateur);
@@ -133,8 +138,6 @@ public class Activity_administrateur extends AppCompatActivity {
         listView.setNestedScrollingEnabled(true);
         linearLayout_menu.setNestedScrollingEnabled(true);
 
-
-
         //Recuperation parametres
         Bundle objetbunble = this.getIntent().getExtras();
         if (objetbunble != null) {
@@ -146,38 +149,37 @@ public class Activity_administrateur extends AppCompatActivity {
             }
         }
 
-        //Initialisation bdd
-        table_user_online = new Table_user_online(this);
-        table_cd_online = new Table_cd_online(this);
-        table_emprunt = new Table_emprunt(this);
+        if (Methodes.internet_diponible(this)) {
+            //Initialisation bdd
+            table_user_online = new Table_user_online(this);
+            table_cd_online = new Table_cd_online(this);
+            table_emprunt = new Table_emprunt(this);
+
+        } else {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }
 
         //Initialisation variables
-        activity = this;
         list_demande_emprunt = new ArrayList<>();
         listItem_cd_user = new ArrayList<>();
 
         new Chargement().execute();
 
-
-
-
-
-
         //Listener sur FAB
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (position_vue == 2 || position_vue == 3) {
-                    Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
-                    Bundle objetbunble = new Bundle();
-                    objetbunble.putString("id_user", string_id_user);
-                    i.putExtras(objetbunble);
-                    Activity_administrateur.this.startActivity(i);
-                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
                     finish();
+
                 } else {
-                    if (position_vue == 4) {
-                        Intent i = new Intent(Activity_administrateur.this, Activity_ajouter_utilisateur.class);
+                    if (position_vue == 2 || position_vue == 3) {
+                        Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
                         Bundle objetbunble = new Bundle();
                         objetbunble.putString("id_user", string_id_user);
                         i.putExtras(objetbunble);
@@ -185,9 +187,20 @@ public class Activity_administrateur extends AppCompatActivity {
                         overridePendingTransition(R.anim.pull_in, R.anim.push_out);
                         finish();
                     } else {
-                        affichage_demande_emprunt();
+                        if (position_vue == 4) {
+                            Intent i = new Intent(Activity_administrateur.this, Activity_ajouter_utilisateur.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_user", string_id_user);
+                            i.putExtras(objetbunble);
+                            Activity_administrateur.this.startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                            finish();
+                        } else {
+                            affichage_demande_emprunt();
+                        }
                     }
                 }
+
             }
         });
 
@@ -196,28 +209,39 @@ public class Activity_administrateur extends AppCompatActivity {
 
             public void onItemClick(AdapterView<?> a, View v, int position,
                                     long id) {
-                HashMap<String, String> map = (HashMap<String, String>) listView
-                        .getItemAtPosition(position);
-                if(!map.get("id").equals("null")){
-                    if (position_vue == 2 || position_vue == 3) {
-                        Intent i = new Intent(Activity_administrateur.this, Activity_details_cd.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_cd", map.get("id"));
-                        objetbunble.putString("id_user", "" + string_id_user);
-                        i.putExtras(objetbunble);
-                        Activity_administrateur.this.startActivity(i);
-                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                        finish();
-                    } else {
-                        Intent i = new Intent(Activity_administrateur.this, Activity_details_utilisateur.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_user_select", "" + map.get("id"));
-                        objetbunble.putString("id_user", "" + string_id_user);
-                        i.putExtras(objetbunble);
-                        Activity_administrateur.this.startActivity(i);
-                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    HashMap<String, String> map = (HashMap<String, String>) listView
+                            .getItemAtPosition(position);
+                    if (!map.get("id").equals("null")) {
+                        if (position_vue == 2 || position_vue == 3) {
+                            Intent i = new Intent(Activity_administrateur.this, Activity_details_cd.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_cd", map.get("id"));
+                            objetbunble.putString("qr_code", map.get("qr_code"));
+                            objetbunble.putString("id_user", "" + string_id_user);
+                            i.putExtras(objetbunble);
+                            Activity_administrateur.this.startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                            finish();
+                        } else {
+                            Intent i = new Intent(Activity_administrateur.this, Activity_details_utilisateur.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_user_select", "" + map.get("id"));
+                            objetbunble.putString("id_user", "" + string_id_user);
+                            i.putExtras(objetbunble);
+                            Activity_administrateur.this.startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        }
                     }
                 }
+
+
 
             }
 
@@ -229,12 +253,21 @@ public class Activity_administrateur extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_modifier_mot_de_passe:
-                        Intent i = new Intent(Activity_administrateur.this, Activity_modifier_profil.class);
-                        Bundle objetbunble = new Bundle();
-                        objetbunble.putString("id_user", string_id_user);
-                        i.putExtras(objetbunble);
-                        Activity_administrateur.this.startActivity(i);
-                        overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        if (!Methodes.internet_diponible(activity)) {
+
+                            Intent intent = new Intent(activity, Activity_lancement.class);
+                            startActivity(intent);
+                            finish();
+
+                        } else {
+                            Intent i = new Intent(Activity_administrateur.this, Activity_modifier_profil.class);
+                            Bundle objetbunble = new Bundle();
+                            objetbunble.putString("id_user", string_id_user);
+                            i.putExtras(objetbunble);
+                            Activity_administrateur.this.startActivity(i);
+                            overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                        }
+
                         return true;
                     default:
                         return false;
@@ -243,47 +276,82 @@ public class Activity_administrateur extends AppCompatActivity {
         });
 
 
-
         //LISTENER BOUTONS
         button_emprunter_un_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Activity_administrateur.this, Activity_emprunter_cd.class);
-                Bundle objetbunble = new Bundle();
-                objetbunble.putString("id_user", string_id_user);
-                i.putExtras(objetbunble);
-                Activity_administrateur.this.startActivity(i);
-                overridePendingTransition(R.anim.pull_in, R.anim.push_out);
-                finish();
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    Intent i = new Intent(Activity_administrateur.this, Activity_emprunter_cd.class);
+                    Bundle objetbunble = new Bundle();
+                    objetbunble.putString("id_user", string_id_user);
+                    i.putExtras(objetbunble);
+                    Activity_administrateur.this.startActivity(i);
+                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                    finish();
+                }
+
             }
         });
         button_rendre_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IntentIntegrator integrator = new IntentIntegrator(activity);
-                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-                integrator.setPrompt("Veuillez scanner l'album");
-                integrator.setCameraId(0);
-                integrator.setBeepEnabled(false);
-                integrator.setBarcodeImageEnabled(false);
-                integrator.initiateScan();
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    IntentIntegrator integrator = new IntentIntegrator(activity);
+                    integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                    integrator.setPrompt("Veuillez scanner l'album");
+                    integrator.setCameraId(0);
+                    integrator.setBeepEnabled(false);
+                    integrator.setBarcodeImageEnabled(false);
+                    integrator.initiateScan();
+                }
+
             }
         });
         button_ajouter_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
-                Bundle objetbunble = new Bundle();
-                objetbunble.putString("id_user", string_id_user);
-                i.putExtras(objetbunble);
-                Activity_administrateur.this.startActivity(i);
-                overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
+                    Bundle objetbunble = new Bundle();
+                    objetbunble.putString("id_user", string_id_user);
+                    i.putExtras(objetbunble);
+                    Activity_administrateur.this.startActivity(i);
+                    overridePendingTransition(R.anim.pull_in, R.anim.push_out);
+                }
+
             }
         });
         button_voir_demande_emprunt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                affichage_demande_emprunt();
+                if (!Methodes.internet_diponible(activity)) {
+
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    affichage_demande_emprunt();
+                }
+
             }
         });
     }
@@ -325,7 +393,7 @@ public class Activity_administrateur extends AppCompatActivity {
                 final String url_image = map.get("image");
                 View view = super.getView(position, convertView, parent);
                 ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_cd);
-                if(map.get("id").equals("null")){
+                if (map.get("id").equals("null")) {
                     image_view_cd.setVisibility(View.GONE);
                 }
                 Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
@@ -351,7 +419,7 @@ public class Activity_administrateur extends AppCompatActivity {
                 final String url_image = map.get("image");
                 View view = super.getView(position, convertView, parent);
                 ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_cd);
-                if(map.get("id").equals("null")){
+                if (map.get("id").equals("null")) {
                     image_view_cd.setVisibility(View.GONE);
                 }
                 Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
@@ -478,6 +546,7 @@ public class Activity_administrateur extends AppCompatActivity {
      * @param alertDialog
      */
     public void confirmation(final String p_id_emprunt, final AlertDialog alertDialog) {
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(Activity_administrateur.this);
         builder.setMessage("Voulez vous validez l'emprunt ?")
                 .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
@@ -512,6 +581,7 @@ public class Activity_administrateur extends AppCompatActivity {
      */
     private void info_dialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(Activity_administrateur.this);
+        builder.setCancelable(false);
         builder.setMessage(message)
                 .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -529,117 +599,181 @@ public class Activity_administrateur extends AppCompatActivity {
      * @param data
      */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
         if (result != null) {
             if (result.getContents() == null) {
 
                 info_dialog("Aucun QRCode détecté");
+
+                retour();
             } else {
-                if (table_emprunt.album_terminer_emprunt(result.getContents(), string_id_user)) {
-                    //TODO améliorer le visuel du dialog
-                    info_dialog("Numéro album : " + result.getContents() + "\nCD rendu");
+                qrcode = result.getContents();
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
                 } else {
-                    info_dialog("Problème rencontré");
+                    new RendreCd().execute();
                 }
 
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
-            //TODO mettre dans la base de données
-
-
         }
+
     }
+
 
     private class Chargement extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new ProgressDialog(activity);
-            mProgressDialog.setTitle("Veuillez patienter");
-            mProgressDialog.setMessage("Chargement en cours...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
+
+            if (!Methodes.internet_diponible(activity)) {
+
+                Intent intent = new Intent(activity, Activity_lancement.class);
+                startActivity(intent);
+                finish();
+
+            } else {
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setTitle("Veuillez patienter");
+                mProgressDialog.setMessage("Connexion en cours...");
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.show();
+            }
         }
 
         @Override
         protected Void doInBackground(Void... params) {
+            if (Methodes.internet_diponible(activity)) {
+                user = table_user_online.get_user(Integer.parseInt(string_id_user));
+                list_cd_utilisateur = table_cd_online.list_cd_utilistaeur(Integer.parseInt(string_id_user));
+                list_demande_emprunt = table_emprunt.demande_emprunt(Integer.parseInt(string_id_user));
+                list_user = table_user_online.list_user();
+                list_cd = table_cd_online.list_cd();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if (Methodes.internet_diponible(activity)) {
+                mProgressDialog.hide();
+                toolbar.setTitle("Bonjour " + user.getIdentifiant());
+                //Génération des list d'items pour les différentes vues
+                for (int i = 0; i < list_user.size(); i++) {
+                    map_user = new HashMap<>();
+                    map_user.put("id", "" + list_user.get(i).getId_user());
+                    map_user.put("info", list_user.get(i).getIdentifiant()+"\n"+list_user.get(i).getNom() +" "+ list_user.get(i).getPrenom());//champ id
+                    listItem_user.add(map_user);
+                }
+
+                if (list_cd.size() > 0) {
+                    for (int i = 0; i < list_cd.size(); i++) {
+                        map_cd = new HashMap<>();
+                        map_cd.put("id", "" + list_cd.get(i).getId_cd());
+                        map_cd.put("info", list_cd.get(i).getNom_artist() + "\n" + list_cd.get(i).getNom_album());//champ id
+                        map_cd.put("image", list_cd.get(i).getImage());//champ id
+                        map_cd.put("qr_code", "" + list_cd.get(i).getQr_code());
+                        listItem_cd.add(map_cd);
+                    }
+                } else {
+                    map_cd = new HashMap<>();
+                    map_cd.put("id", "null");
+                    map_cd.put("info", "Il n'y a aucun CD");//champ id
+                    listItem_cd.add(map_cd);
+                }
+
+                if (list_cd_utilisateur.size() > 0) {
+                    for (int i = 0; i < list_cd_utilisateur.size(); i++) {
+                        map_cd_user = new HashMap<>();
+                        map_cd_user.put("id", "" + list_cd_utilisateur.get(i).getId_cd());
+                        map_cd_user.put("info", list_cd_utilisateur.get(i).getNom_artist() + "\n" + list_cd_utilisateur.get(i).getNom_album());//champ id
+                        map_cd_user.put("image", list_cd_utilisateur.get(i).getImage());//champ id
+                        map_cd_user.put("qr_code", "" + list_cd_utilisateur.get(i).getQr_code());
+                        listItem_cd_user.add(map_cd_user);
+                    }
+                } else {
+                    map_cd = new HashMap<>();
+                    map_cd.put("id", "null");
+                    map_cd.put("info", "Il n'y a aucun CD");//champ id
+                    listItem_cd_user.add(map_cd);
+                }
+
+                for (int i = 0; i < list_demande_emprunt.size(); i++) {
+                    map_demande_emprunt = new HashMap<>();
+                    map_demande_emprunt.put("id", "" + list_demande_emprunt.get(i).getId_emprunt());
+                    User user_demandeur = table_user_online.get_user(list_demande_emprunt.get(i).getId_emprunteur());
+                    CD cd_tmp = table_cd_online.get_cd(list_demande_emprunt.get(i).getQr_code());
+                    map_demande_emprunt.put("titre", cd_tmp.getNom_artist() + " - " + cd_tmp.getNom_album());
+                    map_demande_emprunt.put("demandeur", "Demande par " + user_demandeur.getIdentifiant());
+                    map_demande_emprunt.put("image", cd_tmp.getImage());
+                    listItem_demande_emprunt.add(map_demande_emprunt);
+                }
 
 
+                load_profil();//chargement de la première vue
 
-            user = table_user_online.get_user(Integer.parseInt(string_id_user));
-            list_cd_utilisateur = table_cd_online.list_cd_utilistaeur(Integer.parseInt(string_id_user));
-            list_demande_emprunt = table_emprunt.demande_emprunt(Integer.parseInt(string_id_user));
-            list_user = table_user_online.list_user();
-            list_cd = table_cd_online.list_cd();
+                //on regarde si l'application vient d'etre lancer pour afficher ou non les demandes d'emprunt
+                if (!etat_notif.equals("rien")) {
+                    if (list_demande_emprunt.size() != 0) {
+                        affichage_demande_emprunt();
+                    }
+
+                }
+            }
+        }
+
+    }
+
+    private class RendreCd extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (!Methodes.internet_diponible(activity)) {
+
+                Intent intent = new Intent(activity, Activity_lancement.class);
+                startActivity(intent);
+                finish();
+
+            } else {
+                mProgressDialog = new ProgressDialog(activity);
+                mProgressDialog.setTitle("Veuillez patienter");
+                mProgressDialog.setMessage("Connexion en cours...");
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.setIndeterminate(false);
+                mProgressDialog.show();
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (Methodes.internet_diponible(activity)) {
+                if (table_emprunt.album_terminer_emprunt(qrcode, string_id_user)) {
+                    //TODO améliorer le visuel du dialog
+                    cd = table_cd_online.get_cd(qrcode);
+                    etat_changement = true;
+                }
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
             mProgressDialog.hide();
-            toolbar.setTitle("Bonjour " + user.getIdentifiant());
-            //Génération des list d'items pour les différentes vues
-            for (int i = 0; i < list_user.size(); i++) {
-                map_user = new HashMap<>();
-                map_user.put("id", "" + list_user.get(i).getId_user());
-                map_user.put("info", list_user.get(i).getNom() + "\n" + list_user.get(i).getPrenom());//champ id
-                listItem_user.add(map_user);
-            }
 
-            if( list_cd.size()>0){
-                for (int i = 0; i < list_cd.size(); i++) {
-                    map_cd = new HashMap<>();
-                    map_cd.put("id", "" + list_cd.get(i).getId_cd());
-                    map_cd.put("info", list_cd.get(i).getNom_artist() + "\n" + list_cd.get(i).getNom_album());//champ id
-                    map_cd.put("image", list_cd.get(i).getImage());//champ id
-                    listItem_cd.add(map_cd);
+            if(etat_changement){
+                if (Methodes.internet_diponible(activity)) {
+                    info_dialog("Veuillez rendre le CD \n" + cd.getNom_album() + " - " + cd.getNom_artist());
                 }
             }else{
-                map_cd = new HashMap<>();
-                map_cd.put("id", "null");
-                map_cd.put("info","Il n'y a aucun CD");//champ id
-                listItem_cd.add(map_cd);
+                retour();
+                info_dialog("Aucune correspondace trouvée");
             }
 
-            if(list_cd_utilisateur.size()>0){
-                for (int i = 0; i < list_cd_utilisateur.size(); i++) {
-                    map_cd_user = new HashMap<>();
-                    map_cd_user.put("id", "" + list_cd_utilisateur.get(i).getId_cd());
-                    map_cd_user.put("info", list_cd_utilisateur.get(i).getNom_artist() + "\n" + list_cd_utilisateur.get(i).getNom_album());//champ id
-                    map_cd_user.put("image", list_cd_utilisateur.get(i).getImage());//champ id
-                    listItem_cd_user.add(map_cd_user);
-                }
-            }else{
-                map_cd = new HashMap<>();
-                map_cd.put("id", "null");
-                map_cd.put("info","Il n'y a aucun CD");//champ id
-                listItem_cd_user.add(map_cd);
-            }
-
-            for (int i = 0; i < list_demande_emprunt.size(); i++) {
-                map_demande_emprunt = new HashMap<>();
-                map_demande_emprunt.put("id", "" + list_demande_emprunt.get(i).getId_emprunt());
-                User user_demandeur = table_user_online.get_user(list_demande_emprunt.get(i).getId_emprunteur());
-                CD cd_tmp = table_cd_online.get_cd(list_demande_emprunt.get(i).getQr_code());
-                map_demande_emprunt.put("titre", cd_tmp.getNom_artist() + " - " + cd_tmp.getNom_album());
-                map_demande_emprunt.put("demandeur", "Demande par " + user_demandeur.getIdentifiant());
-                map_demande_emprunt.put("image", cd_tmp.getImage());
-                listItem_demande_emprunt.add(map_demande_emprunt);
-            }
-
-
-            load_profil();//chargement de la première vue
-
-            //on regarde si l'application vient d'etre lancer pour afficher ou non les demandes d'emprunt
-            if (!etat_notif.equals("rien")) {
-                if (list_demande_emprunt.size() != 0) {
-                    affichage_demande_emprunt();
-                }
-
-            }
         }
 
     }

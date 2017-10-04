@@ -1,5 +1,6 @@
 package com.daumont.vasi.vasi.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -84,6 +85,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     private CD mon_cd;
     private String string_id_album, string_id_artist,string_nom_artist,string_id_user,string_qr_code,string_id_cd;
     private String url_gson, url_gson_titres, url_image;
+    private Activity activity;
 
     /**
      * Permet de naviguer entre les différents onglets grâce au menu du bas
@@ -120,7 +122,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        activity = this;
         //Recuperation des elements visuels
         setContentView(R.layout.activity_emprunter_album_details);
         CollapsingToolbarLayout toolbar_layout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
@@ -148,109 +150,128 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
             string_qr_code = objetbunble.getString("qr_code");
 
         }
-        //Initialisation bdd
-        table_cd_online = new Table_cd_online(this);
-        table_user_online = new Table_user_online(this);
-        table_emprunt = new Table_emprunt(this);
-        //Initialisation variables
-        context = this;
-        list_titres = new ArrayList<>();
 
-        //Initialisation JSON
-        queue_titres = Volley.newRequestQueue(context);
-        url_gson_titres = "https://api.deezer.com/album/" + string_id_cd + "/tracks";
-        gsonRequest_titles = new GsonRequest<>(
-                url_gson_titres, List_title.class, null, new Response.Listener<List_title>() {
-            @Override
-            public void onResponse(final List_title response) {
-                for (int i = 0; i < response.getData().size(); i++) {
-                    map_titres = new HashMap<>();
-                    map_titres.put("id", "" + response.getData().get(i).getId());
-                    map_titres.put("info", "" + response.getData().get(i).getTitle());
-                    listItem_titres.add(map_titres);
-                }
-                SimpleAdapter mSchedule = new SimpleAdapter(context,
-                        listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
-                    public View getView(int position, View convertView, ViewGroup parent) {
-
-                        HashMap<String, String> map = (HashMap<String, String>) listView_titres
-                                .getItemAtPosition(position);
-                        View view = super.getView(position, convertView, parent);
-                        ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
-                        Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
-                        return view;
-                    }
-                };
-                listView_titres.setAdapter(mSchedule);
-                listView_titres.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                    public void onItemClick(AdapterView<?> a, View v, int position,
-                                            long id) {
-                        HashMap<String, String> map = (HashMap<String, String>) listView_titres
-                                .getItemAtPosition(position);
-                        final String id_recup = map.get("id");
-                        final String info = map.get("info");
-
-                        Snackbar.make(v, "Non disponible", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                        //TODO MEDIA AUDIO
-                    }
-
-                });
-
-
-            }
-
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-        queue_titres.add(gsonRequest_titles);
-
-
-        Bitmap bitmap = Methodes.generateQRBitmap(string_id_cd);
-        imageView.setImageBitmap(bitmap);
-        mon_cd = table_cd_online.get_cd(string_id_cd);
-        proprietaire =  table_user_online.get_user(mon_cd.getId_proprio());
-        textView_nom_album.setText("Nom album : "+mon_cd.getNom_album());
-        textView_nom_artist.setText("Nom artiste : "+mon_cd.getNom_artist());
-        textView_proprietaire.setText("Propriétaire : "+proprietaire.getIdentifiant());
-
-
-
-
-        //RECHERCHER SI ALBUM DEJA EMPRUNTER
-        if(table_emprunt.album_emprunter(string_qr_code)){
-            info_dialog("Album actuellement emprunté");
-            String identifiant = table_emprunt.album_emprunter_identifiant(string_qr_code);
-            textView_etat_emprunt.setText("Emprunté par "+identifiant);
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
         }else{
-            textView_etat_emprunt.setText("Pas emprunté");
+            //Initialisation bdd
+            table_cd_online = new Table_cd_online(this);
+            table_user_online = new Table_user_online(this);
+            table_emprunt = new Table_emprunt(this);
+            //Initialisation variables
+            context = this;
+            list_titres = new ArrayList<>();
+
+
+            //Initialisation JSON
+            queue_titres = Volley.newRequestQueue(context);
+            url_gson_titres = "https://api.deezer.com/album/" + string_id_cd + "/tracks";
+            gsonRequest_titles = new GsonRequest<>(
+                    url_gson_titres, List_title.class, null, new Response.Listener<List_title>() {
+                @Override
+                public void onResponse(final List_title response) {
+                    for (int i = 0; i < response.getData().size(); i++) {
+                        map_titres = new HashMap<>();
+                        map_titres.put("id", "" + response.getData().get(i).getId());
+                        map_titres.put("info", "" + response.getData().get(i).getTitle());
+                        listItem_titres.add(map_titres);
+                    }
+                    SimpleAdapter mSchedule = new SimpleAdapter(context,
+                            listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
+                        public View getView(int position, View convertView, ViewGroup parent) {
+
+                            HashMap<String, String> map = (HashMap<String, String>) listView_titres
+                                    .getItemAtPosition(position);
+                            View view = super.getView(position, convertView, parent);
+                            ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
+                            Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
+                            TextView textView_sous_titre = (TextView) view.findViewById(R.id.textView_info_sous_titre);
+                            textView_sous_titre.setText("Par "+response.getData().get(0).getArtist().getName());
+                            return view;
+                        }
+                    };
+                    listView_titres.setAdapter(mSchedule);
+                    listView_titres.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                        public void onItemClick(AdapterView<?> a, View v, int position,
+                                                long id) {
+                            HashMap<String, String> map = (HashMap<String, String>) listView_titres
+                                    .getItemAtPosition(position);
+                            final String id_recup = map.get("id");
+                            final String info = map.get("info");
+
+                            Snackbar.make(v, "Non disponible", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                            //TODO MEDIA AUDIO
+                        }
+
+                    });
+
+
+                }
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+            queue_titres.add(gsonRequest_titles);
+
+
+            Bitmap bitmap = Methodes.generateQRBitmap(string_id_cd);
+            imageView.setImageBitmap(bitmap);
+            mon_cd = table_cd_online.get_cd(string_qr_code);
+            proprietaire =  table_user_online.get_user(mon_cd.getId_proprio());
+            textView_nom_album.setText("Nom album : "+mon_cd.getNom_album());
+            textView_nom_artist.setText("Nom artiste : "+mon_cd.getNom_artist());
+            textView_proprietaire.setText("Propriétaire : "+proprietaire.getIdentifiant());
+
+
+
+
+            //RECHERCHER SI ALBUM DEJA EMPRUNTER
+            if(table_emprunt.album_emprunter(string_qr_code)){
+                info_dialog("Album actuellement emprunté");
+                String identifiant = table_emprunt.album_emprunter_identifiant(string_qr_code);
+                textView_etat_emprunt.setText("Emprunté par "+identifiant);
+            }else{
+                textView_etat_emprunt.setText("Pas emprunté");
+            }
+
+            //RECHERCHER EMPRUNT
+            toolbar_layout.setTitle(mon_cd.getNom_artist() + " - " + mon_cd.getNom_album());
+            ImageView imageView_cd = (ImageView) app_bar.findViewById(R.id.imageView_cd);
+            Picasso.with(imageView_cd.getContext()).load(mon_cd.getImage()).centerCrop().fit().into(imageView_cd);
+            imageView_cd.setColorFilter(Color.parseColor("#7F000000"));
         }
 
-        //RECHERCHER EMPRUNT
-        toolbar_layout.setTitle(mon_cd.getNom_artist() + " - " + mon_cd.getNom_album());
-        ImageView imageView_cd = (ImageView) app_bar.findViewById(R.id.imageView_cd);
-        Picasso.with(imageView_cd.getContext()).load(mon_cd.getImage()).centerCrop().fit().into(imageView_cd);
-        imageView_cd.setColorFilter(Color.parseColor("#7F000000"));
+
 
         //Listeners
         fab_emprunt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //test si il n'appartient pas à l'utilisateur
-                if(table_emprunt.album_emprunter(string_qr_code)){
-                    if(table_emprunt.album_emprunter_utilisateur(string_qr_code,string_id_user)){
-                        info_dialog("Vous avez déjà envoyé une demande");
-                    }else{
-                        confirmation("Voulez-vous envoyer une demande d'emprunt pour l'album ?\nL'album est déjà emprunté vous serez sur fil d'attente.");
-                    }
-
+                if (!Methodes.internet_diponible(activity)) {
+                    Intent intent = new Intent(activity, Activity_lancement.class);
+                    startActivity(intent);
+                    finish();
                 }else{
-                    confirmation("Voulez-vous envoyer une demande d'emprunt pour l'album ?");
+                    //test si il n'appartient pas à l'utilisateur
+                    if(table_emprunt.album_emprunter(string_qr_code)){
+                        if(table_emprunt.album_emprunter_utilisateur(string_qr_code,string_id_user)){
+                            info_dialog("Vous avez déjà envoyé une demande");
+                        }else{
+                            confirmation("Voulez-vous envoyer une demande d'emprunt pour l'album ?\nL'album est déjà emprunté vous serez sur fil d'attente.");
+                        }
+
+                    }else{
+                        confirmation("Voulez-vous envoyer une demande d'emprunt pour l'album ?");
+                    }
                 }
+
             }
         });
     }
@@ -275,33 +296,47 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     }
 
     public void confirmation(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_emprunter_album_details.this);
-        builder.setMessage(message)
-                .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        table_emprunt.add_emprunt(new Emprunt(mon_cd.getId_proprio(),Integer.parseInt(string_id_user),mon_cd.getQr_code(),"demande"));
-                        info_dialog("Demande d'emprunt envoyée");
-                    }
-                })
-                .setNegativeButton("Non", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_emprunter_album_details.this);
+            builder.setMessage(message)
+                    .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            table_emprunt.add_emprunt(new Emprunt(mon_cd.getId_proprio(),Integer.parseInt(string_id_user),mon_cd.getQr_code(),"demande"));
+                            info_dialog("Demande d'emprunt envoyée");
+                        }
+                    })
+                    .setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
-                    }
-                });
-        builder.create();
-        builder.show();
+                        }
+                    });
+            builder.create();
+            builder.show();
+        }
+
     }
 
     public void retour(){
-        Intent i = new Intent(Activity_emprunter_album_details.this, Activity_emprunter_cd.class);
-        Bundle objetbunble = new Bundle();
-        objetbunble.putString("id_cd", string_id_cd);
-        objetbunble.putString("id_user", "" + string_id_user);
-        objetbunble.putString("qr_code", "" + string_qr_code);
-        i.putExtras(objetbunble);
-        startActivity(i);
-        overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
-        finish();
+        if (!Methodes.internet_diponible(activity)) {
+            Intent intent = new Intent(activity, Activity_lancement.class);
+            startActivity(intent);
+            finish();
+        }else{
+            Intent i = new Intent(Activity_emprunter_album_details.this, Activity_emprunter_cd.class);
+            Bundle objetbunble = new Bundle();
+            objetbunble.putString("id_cd", string_id_cd);
+            objetbunble.putString("id_user", "" + string_id_user);
+            objetbunble.putString("qr_code", "" + string_qr_code);
+            i.putExtras(objetbunble);
+            startActivity(i);
+            overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            finish();
+        }
+
     }
 
 

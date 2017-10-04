@@ -56,7 +56,7 @@ public class Table_cd_online extends Back4App {
     public CD get_cd(String id_cd) {
 
         ParseQuery query = ParseQuery.getQuery("table_cd");
-        query.whereEqualTo("id_cd", Integer.parseInt(id_cd));
+        query.whereEqualTo("qr_code", Integer.parseInt(id_cd));
         CD cd = null;
         try {
             ParseObject parseObject = query.getFirst();
