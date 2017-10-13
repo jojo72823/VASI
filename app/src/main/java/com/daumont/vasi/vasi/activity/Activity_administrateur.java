@@ -432,6 +432,7 @@ public class Activity_administrateur extends AppCompatActivity {
     /**
      * Permet de charger la vue profil de l'admin
      */
+
     public void load_profil() {
         fab.setImageResource(R.drawable.icon_info);
         position_vue = 1;

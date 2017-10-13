@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
@@ -340,11 +341,13 @@ public class Activity_utilisateur extends AppCompatActivity {
                     HashMap<String, String> map = (HashMap<String, String>) listView
                             .getItemAtPosition(position);
                     if (!map.get("id").equals("null")) {
-                        if (position_vue == 2 || position_vue == 3) {
+                        if (position_vue == 1 || position_vue == 2) {
                             Intent i = new Intent(Activity_utilisateur.this, Activity_details_cd.class);
                             Bundle objetbunble = new Bundle();
                             objetbunble.putString("id_cd", map.get("id"));
+                            objetbunble.putString("qr_code", map.get("qr_code"));
                             objetbunble.putString("id_user", "" + string_id_user);
+
                             i.putExtras(objetbunble);
                             startActivity(i);
                             overridePendingTransition(R.anim.pull_in, R.anim.push_out);
@@ -679,7 +682,7 @@ public class Activity_utilisateur extends AppCompatActivity {
                         map_cd_theque.put("id", "" + list_cd_theque.get(i).getId_cd());
                         map_cd_theque.put("info", list_cd_theque.get(i).getNom_artist() + " - " + list_cd_theque.get(i).getNom_album());//champ id
                         map_cd_theque.put("image", list_cd_theque.get(i).getImage());//champ id
-
+                        map_cd_theque.put("qr_code", "" + list_cd_theque.get(i).getQr_code());
                         listItem_cd_theque.add(map_cd_theque);
                     }
                 }else {
@@ -696,6 +699,7 @@ public class Activity_utilisateur extends AppCompatActivity {
                         map_cd_user.put("id", "" + list_cd_utilisateur.get(i).getId_cd());
                         map_cd_user.put("info", list_cd_utilisateur.get(i).getNom_artist() + " - " + list_cd_utilisateur.get(i).getNom_album());//champ id
                         map_cd_user.put("image", list_cd_utilisateur.get(i).getImage());//champ id
+                        map_cd_user.put("qr_code", "" + list_cd_utilisateur.get(i).getQr_code());
                         listItem_cd_user.add(map_cd_user);
                     }
                 }else {

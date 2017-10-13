@@ -63,8 +63,6 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".activity.Activity_modifier_profil"
             android:screenOrientation="portrait"></activity>
-        <activity android:name=".activity.ActivityQrCode"
-            android:screenOrientation="portrait"></activity>
 
 
     </application>
