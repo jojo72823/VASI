@@ -62,13 +62,7 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
             string_id_user = objetbunble.getString("id_user");
         }
 
-        if (!Methodes.internet_diponible(activity)) {
-
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-
-        } else {
+        if (Methodes.internet_diponible(activity)) {
             //connexion a la base de données
             table_user_online = new Table_user_online(this);
 
@@ -79,11 +73,7 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
         button_ajouter_utilisateur.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!Methodes.internet_diponible(activity)) {
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-                }else{
+                if (Methodes.internet_diponible(activity)) {
                     if (radioButton_administrateur.isChecked()) type = "admin";
                     else type = "classique";
 
@@ -106,11 +96,7 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
                                     table_user_online.add_user(new User(editText_nom.getText().toString(), editText_prenom.getText().toString(), type, editText_identifiant.getText().toString(), editText_password_1.getText().toString()));
                                     ajouter_utilisateur();
 
-                                    if (!Methodes.internet_diponible(activity)) {
-                                        Intent intent = new Intent(activity, Activity_lancement.class);
-                                        startActivity(intent);
-                                        finish();
-                                    }else{
+                                    if (Methodes.internet_diponible(activity)) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_utilisateur.this);
                                         builder.setCancelable(false);
                                         builder.setMessage("Le nouveau compte a été créé")
@@ -163,11 +149,7 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
      * principal
      */
     private void ajouter_utilisateur() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_utilisateur.this);
             builder.setMessage("Utilisateur ajouté")
                     .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
@@ -193,11 +175,7 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_ajouter_utilisateur.this);
             builder.setCancelable(false);
             builder.setMessage("Voulez vous abandonner la création du compte ?")
@@ -209,11 +187,14 @@ public class Activity_ajouter_utilisateur extends AppCompatActivity {
                             intent.putExtras(objetbunble);
                             startActivity(intent);
                             overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+                            dialog.dismiss();
                             finish();
+
                         }
                     })
                     .setNegativeButton("Non", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
 
                         }
                     });

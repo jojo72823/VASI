@@ -6,4 +6,10 @@
         android:orderInCategory="100"
         android:title="Modifier le mot de passe"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_a_propos"
+        android:orderInCategory="100"
+        android:title="à propos"
+        app:showAsAction="never" />
 </menu>

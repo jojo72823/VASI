@@ -51,11 +51,7 @@ public class Activity_modifier_profil extends AppCompatActivity {
             string_id_user = objetbunble.getString("id_user");
         }
 
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             //Initialisation bdd
             table_user_online = new Table_user_online(this);
 
@@ -69,11 +65,7 @@ public class Activity_modifier_profil extends AppCompatActivity {
         button_sauvegarder_profil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!Methodes.internet_diponible(activity)) {
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-                }else{
+                if (Methodes.internet_diponible(activity)) {
                     if (editText_password_1.length() < 4) {
                         Toast.makeText(Activity_modifier_profil.this, "Le mot de passe ne peut avoir une taille inférieur à 4 caratères", Toast.LENGTH_SHORT).show();
                     }else{
@@ -108,11 +100,7 @@ public class Activity_modifier_profil extends AppCompatActivity {
     }
 
     public void retour() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             /**ON DEMANDE CONFIRMATION*****************************************/
             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_modifier_profil.this);
             builder.setMessage("Toute modification ne sera pas sauvegardée. Voulez-vous continuer ?")
@@ -145,17 +133,13 @@ public class Activity_modifier_profil extends AppCompatActivity {
     }
 
     public void info_dialog(String message) {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_modifier_profil.this);
             builder.setCancelable(false);
             builder.setMessage(message)
                     .setPositiveButton("Retour au menu principal", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-
+                            dialog.dismiss();
                             Intent intent = null;
                             if(user.getType().equals("admin")){
                                 intent = new Intent(Activity_modifier_profil.this, Activity_administrateur.class);

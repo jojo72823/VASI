@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -48,6 +49,7 @@ import com.daumont.vasi.vasi.modele.Title;
 import com.daumont.vasi.vasi.modele.User;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -70,6 +72,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     private HashMap<String, String> map_titres;
     private ArrayList<HashMap<String, String>> listItem_titres = new ArrayList<>();
     private ArrayList<Title> list_titres;
+    private ArrayList<String> list_preview;
     //Base de donnees
     private Table_user_online table_user_online;
     private Table_cd_online table_cd_online;
@@ -83,8 +86,12 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     private Context context;
     private User proprietaire;
     private CD mon_cd;
+    private boolean etat_media_fab;
+    private MediaPlayer mediaPlayer;
+    private int position_old;
     private String string_id_album, string_id_artist,string_nom_artist,string_id_user,string_qr_code,string_id_cd;
     private String url_gson, url_gson_titres, url_image;
+
     private Activity activity;
 
     /**
@@ -150,12 +157,11 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
             string_qr_code = objetbunble.getString("qr_code");
 
         }
+        mediaPlayer = new MediaPlayer();
+        etat_media_fab = false;
+        position_old = 0;
 
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             //Initialisation bdd
             table_cd_online = new Table_cd_online(this);
             table_user_online = new Table_user_online(this);
@@ -163,6 +169,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
             //Initialisation variables
             context = this;
             list_titres = new ArrayList<>();
+            list_preview = new ArrayList<>();
 
 
             //Initialisation JSON
@@ -177,6 +184,8 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
                         map_titres.put("id", "" + response.getData().get(i).getId());
                         map_titres.put("info", "" + response.getData().get(i).getTitle());
                         listItem_titres.add(map_titres);
+
+                        list_preview.add(response.getData().get(i).getPreview());
                     }
                     SimpleAdapter mSchedule = new SimpleAdapter(context,
                             listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
@@ -202,9 +211,37 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
                             final String id_recup = map.get("id");
                             final String info = map.get("info");
 
-                            Snackbar.make(v, "Non disponible", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-                            //TODO MEDIA AUDIO
+                            try {
+                                mediaPlayer.reset();
+                                mediaPlayer.setDataSource(list_preview.get(position));
+                                mediaPlayer.prepare();
+
+                                if (etat_media_fab == false) {
+                                    etat_media_fab = true;
+                                    mediaPlayer.start();
+                                    Toast.makeText(Activity_emprunter_album_details.this, "Lecture de "+info, Toast.LENGTH_LONG).show();
+                                }
+
+
+                                if (position == position_old) {
+                                    etat_media_fab = false;
+
+                                    mediaPlayer.stop();
+
+                                }else{
+                                    etat_media_fab = true;
+                                    mediaPlayer.start();
+                                    Toast.makeText(Activity_emprunter_album_details.this, "Lecture de "+info, Toast.LENGTH_LONG).show();
+                                }
+
+
+
+
+                                position_old = position;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            mediaPlayer.start();
                         }
 
                     });
@@ -260,11 +297,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
         fab_emprunt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!Methodes.internet_diponible(activity)) {
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-                }else{
+                if (Methodes.internet_diponible(activity)) {
                     //test si il n'appartient pas à l'utilisateur
                     if(table_emprunt.album_emprunter(string_qr_code)){
                         if(table_emprunt.album_emprunter_utilisateur(string_qr_code,string_id_user)){
@@ -295,6 +328,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
         builder.setMessage(message)
                 .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
                     }
                 });
         builder.create();
@@ -302,21 +336,19 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     }
 
     public void confirmation(String message) {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_emprunter_album_details.this);
             builder.setMessage(message)
                     .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
                             table_emprunt.add_emprunt(new Emprunt(mon_cd.getId_proprio(),Integer.parseInt(string_id_user),mon_cd.getQr_code(),"demande"));
                             info_dialog("Demande d'emprunt envoyée");
                         }
                     })
                     .setNegativeButton("Non", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
 
                         }
                     });
@@ -327,11 +359,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
     }
 
     public void retour(){
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             Intent i = new Intent(Activity_emprunter_album_details.this, Activity_emprunter_cd.class);
             Bundle objetbunble = new Bundle();
             objetbunble.putString("id_cd", string_id_cd);
@@ -340,6 +368,7 @@ public class Activity_emprunter_album_details extends AppCompatActivity {
             i.putExtras(objetbunble);
             startActivity(i);
             overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
+            mediaPlayer.stop();
             finish();
         }
 

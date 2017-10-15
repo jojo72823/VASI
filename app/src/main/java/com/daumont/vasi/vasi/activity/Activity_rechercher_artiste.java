@@ -94,11 +94,7 @@ public class Activity_rechercher_artiste extends AppCompatActivity {
             string_id_user = objetbunble.getString("id_user");
         }
 
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             //Initialisation bdd
             table_user_online = new Table_user_online(this);
 
@@ -116,11 +112,7 @@ public class Activity_rechercher_artiste extends AppCompatActivity {
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    if (!Methodes.internet_diponible(activity)) {
-                        Intent intent = new Intent(activity, Activity_lancement.class);
-                        startActivity(intent);
-                        finish();
-                    }else{
+                    if (Methodes.internet_diponible(activity)) {
                         Toast.makeText(context, "Recherche de l'artiste " + query, Toast.LENGTH_LONG).show();
 
                         final ArrayList<HashMap<String, String>> listItem = new ArrayList<>();
@@ -200,11 +192,7 @@ public class Activity_rechercher_artiste extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             Intent intent = null;
             if(user.getType().equals("admin")){
                 intent = new Intent(Activity_rechercher_artiste.this, Activity_administrateur.class);

@@ -12,6 +12,7 @@ import android.net.NetworkInfo;
 
 import com.daumont.vasi.vasi.activity.ActivityLogin;
 import com.daumont.vasi.vasi.activity.Activity_administrateur;
+import com.daumont.vasi.vasi.activity.Activity_lancement;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -35,11 +36,37 @@ public class Methodes {
         if (networkInfo != null)
         {
             NetworkInfo.State networkState = networkInfo.getState();
+            if (networkState.compareTo(NetworkInfo.State.CONNECTED) == 0)
+            {
+                return true;
+            }
+            else{
+                activity.startActivity(new Intent(activity, Activity_lancement.class));
+                activity.finish();
+                return false;
+            }
+        }else{
+            activity.startActivity(new Intent(activity, Activity_lancement.class));
+            activity.finish();
+            return false;
+        }
+
+    }
+
+    public static boolean internet_diponible_activity_start(Activity activity)
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager)activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null)
+        {
+            NetworkInfo.State networkState = networkInfo.getState();
             if (networkState.compareTo(NetworkInfo.State.CONNECTED) == 0) //connecté à internet
             {
                 return true;
             }
-            else return false;
+            else{
+                return false;
+            }
         }
         else return false;
     }
@@ -80,6 +107,7 @@ public class Methodes {
         builder.setMessage(message)
                 .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
                     }
                 });
         builder.create();

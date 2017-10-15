@@ -146,11 +146,7 @@ public class Activity_details_utilisateur extends AppCompatActivity {
             string_id_user = objetbunble.getString("id_user");
         }
 
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             //Initilisation bdd
             table_user_online = new Table_user_online(this);
             table_cd_online = new Table_cd_online(this);
@@ -192,17 +188,14 @@ public class Activity_details_utilisateur extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_suppression:
-                        if (!Methodes.internet_diponible(activity)) {
-                            Intent intent = new Intent(activity, Activity_lancement.class);
-                            startActivity(intent);
-                            finish();
-                        }else{
+                        if (Methodes.internet_diponible(activity)) {
                             /**ON DEMANDE CONFIRMATION*****************************************/
                             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                             builder.setCancelable(false);
                             builder.setMessage("Etes-vous sûr de vouloir supprimer l'utilisateur")
                                     .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
+                                            dialog.dismiss();
                                             if(string_id_user.equals(string_id_user_select)){
                                                 Toast.makeText(activity, "Vous ne pouvez supprimer votre compte utilisateur", Toast.LENGTH_LONG).show();
                                             }else{
@@ -216,6 +209,7 @@ public class Activity_details_utilisateur extends AppCompatActivity {
                                     })
                                     .setNegativeButton("Non", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
+                                            dialog.dismiss();
 
                                         }
                                     });
@@ -239,13 +233,8 @@ public class Activity_details_utilisateur extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!Methodes.internet_diponible(activity)) {
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-                }else {
+                if (Methodes.internet_diponible(activity)) {
                     Toast.makeText(Activity_details_utilisateur.this, "Actuellement non disponible", Toast.LENGTH_SHORT).show();
-
                 }
 
             }
@@ -325,11 +314,7 @@ public class Activity_details_utilisateur extends AppCompatActivity {
     }
 
     public void retour() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             Intent intent = null;
             User user = table_user_online.get_user(Integer.parseInt(string_id_user));
             if (user.getType().equals("admin")) {

@@ -1,17 +1,20 @@
+TODO à faire plus tard
+dans tous les titres changer le fab 1/2 pour avoir la possibilités d'emprunter le cd
+s'occuper de la partie visualisation utilisateur
+informations emprunt details cd
 
-blur -> https://stackoverflow.com/questions/31641973/how-to-blur-background-images-in-android
+TODO IMPORTANT
+//avant chaque lancement d'activé OK
+dialog.cancel();
+mProgressDialog.dismiss();
+builder.setCancelable(false);
 
-menu retour commande en haut à gauche
 
 Faire de l'asynctask pour toutes les connexions à la bdd
-
-
 --------------------------------
 Faire de l'asynctask pour toutes les connexions à la bdd
-
 --------------------------------
 Nettoyage code
-
 --------------------------------
 connexion internet test everywhere
 

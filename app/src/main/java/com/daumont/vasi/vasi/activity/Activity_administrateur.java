@@ -149,16 +149,18 @@ public class Activity_administrateur extends AppCompatActivity {
             }
         }
 
+        mProgressDialog = new ProgressDialog(activity);
+        mProgressDialog.setTitle("Veuillez patienter");
+        mProgressDialog.setMessage("Connexion en cours...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setIndeterminate(false);
+
         if (Methodes.internet_diponible(this)) {
             //Initialisation bdd
             table_user_online = new Table_user_online(this);
             table_cd_online = new Table_cd_online(this);
             table_emprunt = new Table_emprunt(this);
 
-        } else {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
         }
 
         //Initialisation variables
@@ -171,13 +173,9 @@ public class Activity_administrateur extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!Methodes.internet_diponible(activity)) {
+                mProgressDialog.dismiss();
+                if (Methodes.internet_diponible(activity)) {
 
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-
-                } else {
                     if (position_vue == 2 || position_vue == 3) {
                         Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
                         Bundle objetbunble = new Bundle();
@@ -209,13 +207,8 @@ public class Activity_administrateur extends AppCompatActivity {
 
             public void onItemClick(AdapterView<?> a, View v, int position,
                                     long id) {
-                if (!Methodes.internet_diponible(activity)) {
-
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-
-                } else {
+                mProgressDialog.dismiss();
+                if (Methodes.internet_diponible(activity)) {
                     HashMap<String, String> map = (HashMap<String, String>) listView
                             .getItemAtPosition(position);
                     if (!map.get("id").equals("null")) {
@@ -253,13 +246,8 @@ public class Activity_administrateur extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_modifier_mot_de_passe:
-                        if (!Methodes.internet_diponible(activity)) {
-
-                            Intent intent = new Intent(activity, Activity_lancement.class);
-                            startActivity(intent);
-                            finish();
-
-                        } else {
+                        mProgressDialog.dismiss();
+                        if (Methodes.internet_diponible(activity)) {
                             Intent i = new Intent(Activity_administrateur.this, Activity_modifier_profil.class);
                             Bundle objetbunble = new Bundle();
                             objetbunble.putString("id_user", string_id_user);
@@ -269,6 +257,30 @@ public class Activity_administrateur extends AppCompatActivity {
                         }
 
                         return true;
+
+                    case R.id.action_a_propos:
+
+                        LayoutInflater factory = LayoutInflater.from(activity);
+                        final View alertDialogView = factory.inflate(R.layout.dialog_a_propos, null);
+                        AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+
+                        //GET INTERFACE
+                        Button button_close = (Button) alertDialogView.findViewById(R.id.button_close);
+
+                        adb.setView(alertDialogView);
+                        final AlertDialog alertDialog = adb.show();
+
+                        button_close.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dismiss();
+                            }
+                        });
+
+                        return true;
+
+
+
                     default:
                         return false;
                 }
@@ -280,13 +292,8 @@ public class Activity_administrateur extends AppCompatActivity {
         button_emprunter_un_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!Methodes.internet_diponible(activity)) {
-
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-
-                } else {
+                mProgressDialog.dismiss();
+                if (Methodes.internet_diponible(activity)) {
                     Intent i = new Intent(Activity_administrateur.this, Activity_emprunter_cd.class);
                     Bundle objetbunble = new Bundle();
                     objetbunble.putString("id_user", string_id_user);
@@ -301,13 +308,8 @@ public class Activity_administrateur extends AppCompatActivity {
         button_rendre_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!Methodes.internet_diponible(activity)) {
-
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-
-                } else {
+                mProgressDialog.dismiss();
+                if (Methodes.internet_diponible(activity)) {
                     IntentIntegrator integrator = new IntentIntegrator(activity);
                     integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
                     integrator.setPrompt("Veuillez scanner l'album");
@@ -322,13 +324,8 @@ public class Activity_administrateur extends AppCompatActivity {
         button_ajouter_cd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!Methodes.internet_diponible(activity)) {
-
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-
-                } else {
+                mProgressDialog.dismiss();
+                if (Methodes.internet_diponible(activity)) {
                     Intent i = new Intent(Activity_administrateur.this, Activity_rechercher_artiste.class);
                     Bundle objetbunble = new Bundle();
                     objetbunble.putString("id_user", string_id_user);
@@ -342,13 +339,8 @@ public class Activity_administrateur extends AppCompatActivity {
         button_voir_demande_emprunt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!Methodes.internet_diponible(activity)) {
-
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-
-                } else {
+                mProgressDialog.dismiss();
+                if (Methodes.internet_diponible(activity)) {
                     affichage_demande_emprunt();
                 }
 
@@ -454,15 +446,18 @@ public class Activity_administrateur extends AppCompatActivity {
         builder.setMessage("Vous allez être déconnecté. Voulez-vous continuer ?")
                 .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                        mProgressDialog.dismiss();
                         Intent intent = new Intent(Activity_administrateur.this, ActivityLogin.class);
                         startActivity(intent);
                         overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
                         finish();
+
                     }
                 })
                 .setNegativeButton("Non", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
+                        dialog.cancel();
                     }
                 });
         builder.create();
@@ -569,6 +564,7 @@ public class Activity_administrateur extends AppCompatActivity {
                 })
                 .setNegativeButton("Non", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        alertDialog.dismiss();
                     }
                 });
         builder.create();
@@ -586,6 +582,7 @@ public class Activity_administrateur extends AppCompatActivity {
         builder.setMessage(message)
                 .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                      dialog.dismiss();
                     }
                 });
         builder.create();
@@ -610,11 +607,7 @@ public class Activity_administrateur extends AppCompatActivity {
                 retour();
             } else {
                 qrcode = result.getContents();
-                if (!Methodes.internet_diponible(activity)) {
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-                } else {
+                if (Methodes.internet_diponible(activity)) {
                     new RendreCd().execute();
                 }
 
@@ -631,18 +624,7 @@ public class Activity_administrateur extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            if (!Methodes.internet_diponible(activity)) {
-
-                Intent intent = new Intent(activity, Activity_lancement.class);
-                startActivity(intent);
-                finish();
-
-            } else {
-                mProgressDialog = new ProgressDialog(activity);
-                mProgressDialog.setTitle("Veuillez patienter");
-                mProgressDialog.setMessage("Connexion en cours...");
-                mProgressDialog.setCancelable(false);
-                mProgressDialog.setIndeterminate(false);
+            if (Methodes.internet_diponible(activity)) {
                 mProgressDialog.show();
             }
         }
@@ -734,18 +716,8 @@ public class Activity_administrateur extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (!Methodes.internet_diponible(activity)) {
+            if (Methodes.internet_diponible(activity)) {
 
-                Intent intent = new Intent(activity, Activity_lancement.class);
-                startActivity(intent);
-                finish();
-
-            } else {
-                mProgressDialog = new ProgressDialog(activity);
-                mProgressDialog.setTitle("Veuillez patienter");
-                mProgressDialog.setMessage("Connexion en cours...");
-                mProgressDialog.setCancelable(false);
-                mProgressDialog.setIndeterminate(false);
                 mProgressDialog.show();
             }
         }

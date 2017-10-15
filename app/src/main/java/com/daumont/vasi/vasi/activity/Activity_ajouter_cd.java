@@ -300,6 +300,7 @@ public class Activity_ajouter_cd extends AppCompatActivity {
         builder.setMessage(message)
                 .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
                         table_cd_online.add_cd(mon_cd);
                         Intent intent = null;
                         if(user.getType().equals("admin")){
@@ -329,11 +330,13 @@ public class Activity_ajouter_cd extends AppCompatActivity {
         builder.setMessage("Voulez-vous ajouter le CD à la CDThèque ?")
                 .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
                         info_dialog("CD ajouté à la CDThèque");
                     }
                 })
                 .setNegativeButton("Non", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
 
                     }
                 });

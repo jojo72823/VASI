@@ -3,7 +3,6 @@ package com.daumont.vasi.vasi.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -51,7 +50,7 @@ public class Activity_lancement extends AppCompatActivity {
         //TODO mode en ligne et local
 
         //On test si il y a une connexion internet de disponible
-        if (Methodes.internet_diponible(this)) {
+        if (Methodes.internet_diponible_activity_start(this)) {
             //réveil de la base de donnéese BACK4APP
             table_user_online = new Table_user_online(this);
             table_cd_online = new Table_cd_online(this);
@@ -73,6 +72,7 @@ public class Activity_lancement extends AppCompatActivity {
             builder.setMessage("L'application a besoin d'internet pour fonctionner\nVeuillez l'activer")
                     .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
                             Intent intent = new Intent(Activity_lancement.this, Activity_lancement.class);
                             startActivity(intent);
                             finish();

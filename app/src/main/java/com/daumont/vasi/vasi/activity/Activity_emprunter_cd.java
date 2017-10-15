@@ -85,11 +85,7 @@ public class Activity_emprunter_cd extends AppCompatActivity {
         if (objetbunble != null) {
             string_id_user = objetbunble.getString("id_user");
         }
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             //Initialisation bdd
             table_user_online = new Table_user_online(this);
             table_cd_online = new Table_cd_online(this);
@@ -173,11 +169,7 @@ public class Activity_emprunter_cd extends AppCompatActivity {
         button_scanner_album.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!Methodes.internet_diponible(activity)) {
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-                }else{
+                if (Methodes.internet_diponible(activity)) {
                     IntentIntegrator integrator = new IntentIntegrator(activity);
                     integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
                     integrator.setPrompt("Veuillez scanner l'album.");
@@ -206,11 +198,7 @@ public class Activity_emprunter_cd extends AppCompatActivity {
             if (result.getContents() == null) {
                 Toast.makeText(this, "Aucun QRCode trouvé", Toast.LENGTH_LONG).show();
             } else {
-                if (!Methodes.internet_diponible(activity)) {
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-                }else{
+                if (Methodes.internet_diponible(activity)) {
                     qr_code_album = result.getContents();
                     Toast.makeText(this, "Numéro album : " + result.getContents(), Toast.LENGTH_LONG).show();
                     cd_emprunt = table_cd_online.get_cd(Integer.parseInt(qr_code_album));
@@ -234,11 +222,7 @@ public class Activity_emprunter_cd extends AppCompatActivity {
     }
 
     public void retour() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        } else {
+        if (Methodes.internet_diponible(activity)) {
             Intent intent = null;
             User user = table_user_online.get_user(Integer.parseInt(string_id_user));
             if (user.getType().equals("admin")) {
@@ -261,7 +245,9 @@ public class Activity_emprunter_cd extends AppCompatActivity {
         builder.setMessage(message)
                 .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
                         retour();
+
                     }
                 });
         builder.create();
@@ -270,23 +256,21 @@ public class Activity_emprunter_cd extends AppCompatActivity {
 
 
     public void confirmation() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             /**ON DEMANDE CONFIRMATION*****************************************/
             CD cd = table_cd_online.get_cd(cd_emprunt.getQr_code());
             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_emprunter_cd.this);
             builder.setMessage("Voulez-vous envoyer une demande d'emprunt pour l'album " + cd.getNom_album() + "-" + cd.getNom_artist() + "?")
                     .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
                             table_emprunt.add_emprunt(new Emprunt(cd_emprunt.getId_proprio(), Integer.parseInt(string_id_user), cd_emprunt.getQr_code(), "demande"));
                             info_dialog("Demande d'emprunt envoyée");
                         }
                     })
                     .setNegativeButton("Non", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
 
                         }
                     });

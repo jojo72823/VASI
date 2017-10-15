@@ -5,6 +5,13 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_admin">Activity_admin</string>
     <string name="title_activity_details">Activity_details</string>
+
+
+    <string name="a_propos">Application développée\n par Jonathan DAUMONT promo 2018\n\nUne idée de Simon BELLONCLE\nPrésident du VASI 2017-2018</string>
+
+
+
+    <string name="version">v. 17.10.15</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

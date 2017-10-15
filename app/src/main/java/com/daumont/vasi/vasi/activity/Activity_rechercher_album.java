@@ -66,11 +66,7 @@ public class Activity_rechercher_album extends AppCompatActivity {
         list_album = new List_Album();
 
 
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             //Recuperation parametres
             Bundle objetbunble = this.getIntent().getExtras();
             if (objetbunble != null) {
@@ -151,11 +147,7 @@ public class Activity_rechercher_album extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             Intent intent = new Intent(Activity_rechercher_album.this, Activity_rechercher_artiste.class);
             Bundle objetbunble = new Bundle();
             objetbunble.putString("id_user", string_id_user);

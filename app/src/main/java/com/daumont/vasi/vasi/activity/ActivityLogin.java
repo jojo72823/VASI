@@ -60,6 +60,10 @@ public class ActivityLogin extends AppCompatActivity {
         editText_login = (EditText) findViewById(R.id.editText_login);
         editText_password = (EditText) findViewById(R.id.editText_password);
         mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setTitle("Veuillez patienter");
+        mProgressDialog.setMessage("Connexion en cours...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setIndeterminate(false);
 
         //DATABASE
         table_user_online = new Table_user_online(this);
@@ -73,19 +77,6 @@ public class ActivityLogin extends AppCompatActivity {
                     login = editText_login.getText().toString();
                     password = editText_password.getText().toString();
                     new Connexion().execute();
-                }else{
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ActivityLogin.this);
-                    builder.setCancelable(false);
-                    builder.setMessage("Internet n'est pas activé\nVeuillez l'activer.")
-                            .setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Intent intent = new Intent(ActivityLogin.this, Activity_lancement.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            });
-                    builder.create();
-                    builder.show();
                 }
 
 
@@ -114,10 +105,7 @@ public class ActivityLogin extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            mProgressDialog.setTitle("Veuillez patienter");
-            mProgressDialog.setMessage("Connexion en cours...");
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.setIndeterminate(false);
+
             mProgressDialog.show();
 
         }
@@ -131,7 +119,6 @@ public class ActivityLogin extends AppCompatActivity {
             }
 
 
-
             return null;
         }
 
@@ -141,6 +128,7 @@ public class ActivityLogin extends AppCompatActivity {
             if (id_user != -1) {//si on recupere un id pour l'utilisateur
                 mProgressDialog.hide();
                 if (user.getType().equals("admin")) {//on charge une session admin
+                    mProgressDialog.dismiss();
                     Intent intent = new Intent(activity, Activity_administrateur.class);
                     Bundle objetbunble = new Bundle();
                     //On passe en parametre l'id utilisateur
@@ -151,8 +139,7 @@ public class ActivityLogin extends AppCompatActivity {
                     overridePendingTransition(R.anim.pull_in, R.anim.push_out);
                     finish();
                 } else {//on charge une session classique
-
-
+                    mProgressDialog.dismiss();
                     Intent intent = new Intent(activity, Activity_utilisateur.class);
                     //On passe en parametre l'id utilisateur
                     Bundle objetbunble = new Bundle();
@@ -165,9 +152,7 @@ public class ActivityLogin extends AppCompatActivity {
                 }
             } else {//n'exisste pas on incremente le nombre d'essai
                 mProgressDialog.hide();
-                    Methodes.info_dialog("Le compte n'existe pas ou le mot de passe est incorrect", activity);
-
-
+                Methodes.info_dialog("Le compte n'existe pas ou le mot de passe est incorrect", activity);
 
             }
         }

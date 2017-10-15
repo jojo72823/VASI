@@ -206,11 +206,7 @@ public class Activity_details_cd extends AppCompatActivity {
             qr_code = Integer.parseInt(objetbunble.getString("qr_code"));
             string_id_user = objetbunble.getString("id_user");
         }
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             //Initialisation bdd
             table_cd_online = new Table_cd_online(this);
             table_user_online = new Table_user_online(this);
@@ -352,7 +348,10 @@ public class Activity_details_cd extends AppCompatActivity {
                         File fileDir = new File(Environment.getExternalStorageDirectory() +
                                 "/vasi_qr_code");
                         fileDir.mkdirs();
-                        File file = new File(fileDir, mon_cd.getQr_code()+"_"+mon_cd.getNom_album()+"_"+mon_cd.getNom_artist()+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
+                        String filename =  mon_cd.getQr_code()+"_"+mon_cd.getNom_album()+"_"+mon_cd.getNom_artist();
+                        filename = filename.replace(" ", "");
+                        filename = filename.replace("/", "");
+                        File file = new File(fileDir,filename+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
                         try{
                             fOut = new FileOutputStream(file);
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
@@ -371,17 +370,14 @@ public class Activity_details_cd extends AppCompatActivity {
 
                         return true;
                     case R.id.action_suppression:
-                        if (!Methodes.internet_diponible(activity)) {
-                            Intent intent = new Intent(activity, Activity_lancement.class);
-                            startActivity(intent);
-                            finish();
-                        }else{
+                        if (Methodes.internet_diponible(activity)) {
                             /**ON DEMANDE CONFIRMATION*****************************************/
                             AlertDialog.Builder builder = new AlertDialog.Builder(Activity_details_cd.this);
                             builder.setCancelable(false);
                             builder.setMessage("Etes-vous sûr de vouloir supprimer l'album de la CDthèque ?")
                                     .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
+                                            dialog.dismiss();
                                             if (mon_cd.getId_proprio() == Integer.parseInt(string_id_user)) {
                                                 table_cd_online.delete_cd(mon_cd.getId_cd());
                                                 retour();
@@ -394,6 +390,7 @@ public class Activity_details_cd extends AppCompatActivity {
                                     })
                                     .setNegativeButton("Non", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
+                                            dialog.dismiss();
 
                                         }
                                     });
@@ -414,11 +411,7 @@ public class Activity_details_cd extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!Methodes.internet_diponible(activity)) {
-                    Intent intent = new Intent(activity, Activity_lancement.class);
-                    startActivity(intent);
-                    finish();
-                }else{
+                if (Methodes.internet_diponible(activity)) {
                     try {
                         mediaPlayer.reset();
                         mediaPlayer.setDataSource(list_preview.get(0));
@@ -456,11 +449,7 @@ public class Activity_details_cd extends AppCompatActivity {
     }
 
     public void retour() {
-        if (!Methodes.internet_diponible(activity)) {
-            Intent intent = new Intent(activity, Activity_lancement.class);
-            startActivity(intent);
-            finish();
-        }else{
+        if (Methodes.internet_diponible(activity)) {
             Intent intent = null;
             User user = table_user_online.get_user(Integer.parseInt(string_id_user));
             if (user.getType().equals("admin")) {
@@ -474,6 +463,7 @@ public class Activity_details_cd extends AppCompatActivity {
             startActivity(intent);
             overridePendingTransition(R.anim.pull_in_return, R.anim.push_out_return);
             mediaPlayer.stop();
+
             finish();
         }
 
