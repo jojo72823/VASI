@@ -84,6 +84,7 @@ public class Activity_utilisateur extends AppCompatActivity {
     /**
      * Listener pour le menu situé en bas de page
      */
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
