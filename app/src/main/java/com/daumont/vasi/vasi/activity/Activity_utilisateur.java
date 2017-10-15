@@ -96,6 +96,7 @@ public class Activity_utilisateur extends AppCompatActivity {
                     fab_user.setImageResource(R.drawable.alarm);
                     load_navigation_menu();
                     return true;
+
                 case R.id.navigation_cd_empruntes:
                     listView.setAdapter(null);
                     position_infos = false;
