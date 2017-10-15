@@ -93,7 +93,7 @@ public class Activity_utilisateur extends AppCompatActivity {
                 case R.id.navigation_profil:
                     listView.setAdapter(null);
                     position_infos = true;
-                    fab_user.setImageResource(R.drawable.icon_info);
+                    fab_user.setImageResource(R.drawable.alarm);
                     load_navigation_menu();
                     return true;
                 case R.id.navigation_cd_empruntes:

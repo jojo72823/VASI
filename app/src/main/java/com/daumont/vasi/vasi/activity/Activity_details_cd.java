@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
@@ -16,6 +18,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +41,6 @@ import com.bumptech.glide.Glide;
 import com.daumont.vasi.vasi.Methodes;
 import com.daumont.vasi.vasi.R;
 import com.daumont.vasi.vasi.database.Table_cd_online;
-import com.daumont.vasi.vasi.database.Table_emprunt;
 import com.daumont.vasi.vasi.database.Table_user_online;
 import com.daumont.vasi.vasi.deezer.GsonRequest;
 import com.daumont.vasi.vasi.deezer.List_Album;
@@ -49,7 +51,11 @@ import com.daumont.vasi.vasi.modele.Title;
 import com.daumont.vasi.vasi.modele.User;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -71,6 +77,7 @@ public class Activity_details_cd extends AppCompatActivity {
     private FloatingActionButton fab;
     private LinearLayout layout_infos;
     private LinearLayout layout;
+    private Bitmap bitmap;
 
     //tableaux & lists
     private List_Album list_album;
@@ -196,7 +203,6 @@ public class Activity_details_cd extends AppCompatActivity {
         Bundle objetbunble = this.getIntent().getExtras();
         if (objetbunble != null) {
             id_cd = objetbunble.getString("id_cd");
-
             qr_code = Integer.parseInt(objetbunble.getString("qr_code"));
             string_id_user = objetbunble.getString("id_user");
         }
@@ -227,9 +233,12 @@ public class Activity_details_cd extends AppCompatActivity {
                         map_titres = new HashMap<>();
                         map_titres.put("id", "" + response.getData().get(i).getId());
                         map_titres.put("info", ""+response.getData().get(i).getTitle());
+
+
                         listItem_titres.add(map_titres);
                         list_preview.add(response.getData().get(i).getPreview());
                     }
+
                     first_title=response.getData().get(0).getTitle();
                     SimpleAdapter mSchedule = new SimpleAdapter(context,
                             listItem_titres, R.layout.layout_titre, new String[]{"info"}, new int[]{R.id.textView_info_titre}) {
@@ -242,9 +251,8 @@ public class Activity_details_cd extends AppCompatActivity {
                             ImageView image_view_cd = (ImageView) view.findViewById(R.id.image_view_titre);
                             TextView textView_sous_titre = (TextView) view.findViewById(R.id.textView_info_sous_titre);
                             textView_sous_titre.setText("Par "+response.getData().get(0).getArtist().getName());
-                            Picasso.with(image_view_cd.getContext()).load(mon_cd.getImage()).centerCrop().fit().into(image_view_cd);
 
-
+                            Picasso.with(image_view_cd.getContext()).load(url_image).centerCrop().fit().into(image_view_cd);
 
                             ImageView imageView_anim = (ImageView) view.findViewById(R.id.imageView_anim);
                             Glide.with(activity).load(R.drawable.anim).into(imageView_anim);
@@ -317,34 +325,51 @@ public class Activity_details_cd extends AppCompatActivity {
 
 
 
-        Bitmap bitmap = Methodes.generateQRBitmap(id_cd);
+        bitmap = Methodes.generateQRBitmap(""+qr_code);
         imageView.setImageBitmap(bitmap);
         mon_cd = table_cd_online.get_cd(qr_code);
         proprietaire = table_user_online.get_user(mon_cd.getId_proprio());
         textView_nom_album.setText("Nom album : " + mon_cd.getNom_album());
         textView_nom_artist.setText("Nom artiste : " + mon_cd.getNom_artist());
         textView_proprietaire.setText("Propriétaire : " + proprietaire.getIdentifiant());
-        Table_emprunt table_emprunt = new Table_emprunt(this);
-        String etat_emprunt =  table_emprunt.get_etat_emprunt_cd(qr_code);
-        if(etat_emprunt.equals("preter")){
-            textView_etat_emprunt.setText("Actuellement indisponible");
-        }else{
-                textView_etat_emprunt.setText("Actuellement disponible");
-        }
-
-
-
+        textView_etat_emprunt.setText("Aucun renseignement sur l'emprunt");
 
         //TODO RECHERCHER EMPRUNT
         toolbar_layout.setTitle(mon_cd.getNom_artist() + " - " + mon_cd.getNom_album());
         ImageView imageView_cd = (ImageView) app_bar.findViewById(R.id.imageView_cd);
         Picasso.with(imageView_cd.getContext()).load(mon_cd.getImage()).centerCrop().fit().into(imageView_cd);
+        url_image = mon_cd.getImage();
         imageView_cd.setColorFilter(Color.parseColor("#7F000000"));
 
         toolbar.setOnMenuItemClickListener(new android.support.v7.widget.Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
+
+                    case R.id. action_download_qr_code:
+
+                        OutputStream fOut = null;
+                        File fileDir = new File(Environment.getExternalStorageDirectory() +
+                                "/vasi_qr_code");
+                        fileDir.mkdirs();
+                        File file = new File(fileDir, mon_cd.getQr_code()+"_"+mon_cd.getNom_album()+"_"+mon_cd.getNom_artist()+".jpg"); // the File to save , append increasing numeric counter to prevent files from getting overwritten.
+                        try{
+                            fOut = new FileOutputStream(file);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
+                            fOut.flush(); // Not really required
+                            fOut.close(); // do not forget to close the stream
+                            MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
+                            Methodes.info_dialog("Exportation du QrCode réussie\nIl est dans le dossier vasi_qr_code", activity);
+                        }catch (FileNotFoundException e) {
+                            Methodes.info_dialog("Un problème est survenu", activity);
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                            Log.e("ERROR", "export ->" + e);
+                            Methodes.info_dialog("Un problème est survenu", activity);
+                        }
+
+                        return true;
                     case R.id.action_suppression:
                         if (!Methodes.internet_diponible(activity)) {
                             Intent intent = new Intent(activity, Activity_lancement.class);

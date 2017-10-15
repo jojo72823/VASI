@@ -434,7 +434,7 @@ public class Activity_administrateur extends AppCompatActivity {
      */
 
     public void load_profil() {
-        fab.setImageResource(R.drawable.icon_info);
+        fab.setImageResource(R.drawable.alarm);
         position_vue = 1;
         listView.setVisibility(View.GONE);
         linearLayout_menu.setVisibility(View.VISIBLE);

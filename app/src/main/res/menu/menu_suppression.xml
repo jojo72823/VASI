@@ -6,4 +6,10 @@
         android:orderInCategory="100"
         android:title="Supprimer de la CDthèque"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_download_qr_code"
+        android:orderInCategory="100"
+        android:title="Télécharger le QrCode"
+        app:showAsAction="never" />
 </menu>

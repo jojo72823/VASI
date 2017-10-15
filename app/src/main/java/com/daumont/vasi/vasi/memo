@@ -1,0 +1,54 @@
+
+blur -> https://stackoverflow.com/questions/31641973/how-to-blur-background-images-in-android
+
+menu retour commande en haut à gauche
+
+Faire de l'asynctask pour toutes les connexions à la bdd
+
+
+--------------------------------
+Faire de l'asynctask pour toutes les connexions à la bdd
+
+--------------------------------
+Nettoyage code
+
+--------------------------------
+connexion internet test everywhere
+
+ /**
+     * ATTRIBUTES
+     */
+     //INTERFACE
+     //BDD
+     //ARRAYLIST
+    //OTHER
+
+     //GET INTERFACE
+      //INITIALIZE
+      //LISTENER
+
+
+private class Connexion extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (Methodes.internet_diponible(activity)) {
+                mProgressDialog.show();
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (Methodes.internet_diponible(activity)) {
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mProgressDialog.hide();
+
+
+        }
+    }

@@ -50,7 +50,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/icon_user" />
+        app:srcCompat="@drawable/alarm" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation_admin"
